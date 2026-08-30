@@ -1,12 +1,52 @@
 {
   "summary": {
-    "total_processed": 25,
+    "total_processed": 27,
     "recovered_count": 20,
-    "recovery_rate_pct": 80.0,
-    "total_amount_recovered_rupees": 41980.0,
-    "generated_at": "2026-08-30T18:16:09.307254"
+    "recovery_rate_pct": 74.1,
+    "total_amount_recovered_rupees": 35480.0,
+    "generated_at": "2026-08-30T19:31:02.736766"
   },
   "results": [
+    {
+      "payment_id": "pay_TW0ExudYOqzeL7",
+      "customer_name": "Real Test Customer 1",
+      "amount": 49900,
+      "error_reason": "international_transaction_not_allowed",
+      "action_taken": "request_new_payment_method",
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Real Test Customer 1,\n\nWe noticed your recent payment of \u20b9499.00 didn't go through because international cards are currently not supported.\n\nNo worries at all! Could you please reply to this email or contact our support team so we can help you set up an alternative payment method?\n\nThanks for your patience and understanding,\nThe Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "timestamp": "2026-08-30T19:28:40.965850",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "data_source": "real_razorpay_test_api"
+    },
+    {
+      "payment_id": "pay_TW0K4mXKldNsbf",
+      "customer_name": "Real Test Customer 2",
+      "amount": 49900,
+      "error_reason": "payment_failed",
+      "action_taken": "retry_later",
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Real Test Customer 2,\n\nWe noticed your recent payment of \u20b9499.00 couldn't be processed. No worries at all\u2014these things happen!\n\nCould you please take a moment to retry the payment when you have a free second? \n\nIf you need any help, just reply to this email.\n\nBest regards,\nYour Support Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "timestamp": "2026-08-30T19:28:46.146271",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "data_source": "real_razorpay_test_api"
+    },
     {
       "payment_id": "pay_test1000",
       "customer_name": "Arjun Kapoor",
@@ -14,17 +54,23 @@
       "error_reason": "issuer_unavailable",
       "action_taken": "retry_soon",
       "recovery_email": {
-        "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Arjun,\n\nWe noticed your recent payment of \u20b9149.00 didn't go through because your bank's payment gateway is currently down.\n\nNo worries at all\u2014this is usually temporary. Could you please retry the payment soon?\n\nIf you need any help, we're here for you.\n\nBest,\n[Your Company Name]"
+        "subject": "Action needed: Payment for your recent order of \u20b91499.00",
+        "body": "Hi Arjun,\n\nWe tried to process your payment of \u20b91499.00, but it looks like your bank's payment gateway is currently experiencing downtime. No worries at all!\n\nCould you please try the payment again in a little while? You can easily retry from your account dashboard whenever you're ready.\n\nLet us know if you need any help.\n\nBest,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:13:58.746168",
+          "timestamp": "2026-08-30T19:28:51.450997",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-30T21:28:51.450997",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1001",
@@ -33,17 +79,18 @@
       "error_reason": "issuer_unavailable",
       "action_taken": "retry_soon",
       "recovery_email": {
-        "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Sneha,\n\nWe noticed your recent payment of \u20b92999.00 didn't go through because your bank's payment gateway is currently experiencing a temporary outage.\n\nNo worries at all! Please feel free to retry your payment soon when the bank's system is back up. \n\nIf you need any help, we're always here for you.\n\nWarmly,\n[Your Company Name]"
+        "subject": "Action needed: Payment for your recent order of \u20b92999.00",
+        "body": "Hi Sneha,\n\nWe noticed your recent payment of \u20b92999.00 didn't go through because your bank's payment gateway is currently down. No worries at all\u2014this is completely temporary!\n\nCould you please try retrying the payment soon? If you run into any trouble, we are always here to help.\n\nWarm regards,\nTeam Support"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:04.243143",
+          "timestamp": "2026-08-30T19:28:56.456596",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1002",
@@ -52,17 +99,23 @@
       "error_reason": "incorrect_otp",
       "action_taken": "retry_immediately",
       "recovery_email": {
-        "subject": "Action needed: Your recent payment for \u20b92999.00",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b92999.00 didn't go through because the OTP entered was incorrect. No worries at all\u2014these things happen!\n\nCould you please retry your payment at your earliest convenience? You can complete the transaction immediately using the link below.\n\n[Retry Payment Now]\n\nThanks,\nThe Team"
+        "subject": "Action needed: Payment for your order",
+        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b92,999.00 didn't go through because the OTP entered was incorrect.\n\nNo worries at all! You can easily retry the payment now to secure your purchase:\n\n[Retry Payment Link]\n\nIf you have any questions, just reply to this email. We're here to help!\n\nBest,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:09.414224",
+          "timestamp": "2026-08-30T19:29:01.723145",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-30T19:34:01.723145",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1003",
@@ -71,27 +124,28 @@
       "error_reason": "card_declined",
       "action_taken": "retry_later",
       "recovery_email": {
-        "subject": "Action needed: Update your payment for your recent order",
-        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b9999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all! Please take a moment to retry your payment when you have a chance, or use a different payment method to complete your order.\n\nIf you need any help, just let us know.\n\nBest,\nThe Team"
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Divya Reddy,\n\nWe tried to process your payment of \u20b9999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all! Please wait a little while and try updating your payment method when you're ready. You can easily complete the transaction using the link below:\n\n[Update Payment Link]\n\nThanks for your patience and for choosing us!\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:14.628096",
+          "timestamp": "2026-08-30T19:29:06.987317",
           "outcome": "still_failed"
         },
         {
           "attempt": 2,
-          "timestamp": "2026-08-31T06:14:14.628096",
+          "timestamp": "2026-08-31T07:29:06.987317",
           "outcome": "still_failed"
         },
         {
           "attempt": 3,
-          "timestamp": "2026-08-31T18:14:14.628096",
+          "timestamp": "2026-08-31T19:29:06.987317",
           "outcome": "still_failed"
         }
       ],
-      "final_status": "unrecovered"
+      "final_status": "unrecovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1004",
@@ -100,22 +154,18 @@
       "error_reason": "issuer_unavailable",
       "action_taken": "retry_soon",
       "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Divya Reddy,\n\nWe noticed that your recent payment of \u20b92999.00 couldn't be processed because your bank's payment gateway is currently down.\n\nDon't worry, your order is safe with us! Since this is a temporary bank issue, please feel free to retry the payment soon.\n\nIf you need any help, just reply to this email.\n\nWarm regards,\nCustomer Support"
+        "subject": "Action needed: Payment for your recent order",
+        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b92999.00 didn't go through because your bank's payment gateway is currently experiencing downtime.\n\nNo worries at all! Please feel free to retry the payment soon when it's back up. If you need any help, we're right here for you.\n\nWarmly,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:19.831406",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-08-30T20:14:19.831406",
+          "timestamp": "2026-08-30T19:29:12.073784",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1005",
@@ -124,27 +174,18 @@
       "error_reason": "insufficient_funds",
       "action_taken": "retry_later",
       "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Arjun,\n\nWe tried to process your payment of \u20b9999.00, but it was unfortunately declined by your bank due to insufficient funds.\n\nNo worries at all! Please add funds or use a different payment method and retry your transaction whenever you're ready.\n\nIf you need any help, we're just a reply away.\n\nBest regards,\nSupport Team"
+        "subject": "Action needed: Payment for your recent order",
+        "body": "Hi Arjun,\n\nWe tried to process your payment of \u20b9999.00, but it was declined by your bank due to insufficient funds.\n\nNo worries at all! Please feel free to retry the payment whenever you're ready. \n\nIf you need any assistance, just reply to this email.\n\nWarmly,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:25.056877",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-08-31T06:14:25.056877",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-08-31T18:14:25.056877",
-          "outcome": "still_failed"
+          "timestamp": "2026-08-30T19:29:17.031145",
+          "outcome": "recovered"
         }
       ],
-      "final_status": "unrecovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1006",
@@ -154,16 +195,27 @@
       "action_taken": "retry_later",
       "recovery_email": {
         "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Aarav,\n\nWe tried processing your payment of \u20b91999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all! Please wait a little while and try updating your payment method when you're ready. You can easily retry the transaction through your account dashboard.\n\nLet us know if you need any help.\n\nBest regards,\nCustomer Support Team"
+        "body": "Hi Aarav,\n\nWe tried to process your payment of \u20b91999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all! Since it looks like a temporary issue, please feel free to retry your payment later using the same card or a different method.\n\nIf you need any assistance, we're always here to help.\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:30.130571",
+          "timestamp": "2026-08-30T19:29:22.505669",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-31T07:29:22.505669",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "timestamp": "2026-08-31T19:29:22.505669",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1007",
@@ -173,16 +225,27 @@
       "action_taken": "request_new_payment_method",
       "recovery_email": {
         "subject": "Action required: Update your payment method for \u20b92999.00",
-        "body": "Hi Rohan,\n\nWe tried to process your recent payment of \u20b92999.00, but it looks like your card has expired.\n\nTo keep your service running smoothly, could you please take a moment to update your payment details using a different card?\n\nYou can easily update it here: [Insert Link]\n\nLet us know if you need any help!\n\nBest regards,\n[Your Company Name]"
+        "body": "Hi Rohan,\n\nWe tried to process your payment of \u20b92999.00, but it looks like your card has expired.\n\nCould you please update your payment details when you have a moment so we can keep things running smoothly for you?\n\nUpdate payment here: [Link]\n\nBest,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:35.215778",
+          "timestamp": "2026-08-30T19:29:27.762453",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-31T01:29:27.762453",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "timestamp": "2026-08-31T07:29:27.762453",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1008",
@@ -191,17 +254,28 @@
       "error_reason": "insufficient_funds",
       "action_taken": "retry_later",
       "recovery_email": {
-        "subject": "Action needed: Payment update for your recent purchase",
-        "body": "Hi Priya,\n\nWe tried processing your payment of \u20b91999.00, but unfortunately, your bank declined the transaction due to insufficient funds.\n\nNo worries at all! Please add funds or use a different payment method and retry when you're ready. You can complete your purchase here: [Link].\n\nLet us know if you need any help.\n\nWarmly,\nThe Team"
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Priya,\n\nWe noticed your recent payment of \u20b91,999.00 didn't go through because your bank declined the transaction due to insufficient funds.\n\nNo worries at all! Please add funds or use a different payment method when you have a moment, and feel free to retry the transaction later.\n\nLet us know if you need any help.\n\nBest,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:40.374813",
+          "timestamp": "2026-08-30T19:29:33.043632",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-31T07:29:33.043632",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "timestamp": "2026-08-31T19:29:33.043632",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1009",
@@ -210,17 +284,23 @@
       "error_reason": "incorrect_otp",
       "action_taken": "retry_immediately",
       "recovery_email": {
-        "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Priya,\n\nWe noticed your recent payment of \u20b92999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries at all! You can easily retry your payment right away to complete your order.\n\n[Retry Payment Now]\n\nIf you need any help, just reply to this email.\n\nBest regards,\nYour Support Team"
+        "subject": "Action needed: Payment unsuccessful for your recent order",
+        "body": "Hi Priya,\n\nWe noticed your recent payment of \u20b92,999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014it happens! You can easily retry your payment right away to secure your purchase.\n\n[Retry Payment Now]\n\nIf you need any help, just reply to this email.\n\nWarmly,\nCustomer Support"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:45.465287",
+          "timestamp": "2026-08-30T19:29:38.316669",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-30T19:34:38.316669",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1010",
@@ -230,21 +310,17 @@
       "action_taken": "request_new_payment_method",
       "recovery_email": {
         "subject": "Action required: Update your payment method for \u20b9999.00",
-        "body": "Hi Ishita,\n\nWe couldn't process your recent payment of \u20b9999.00 because your card has expired. To keep your service running smoothly, could you please update your payment details by adding a new card?\n\nYou can easily update it here: [Insert Link]\n\nLet us know if you need any help!\n\nBest regards,\n[Your Company Name]"
+        "body": "Hi Ishita,\n\nWe tried to process your recent payment of \u20b9999.00, but it looks like your card has expired.\n\nTo keep everything running smoothly, could you please take a moment to update your payment details with a new card? You can easily update it here: [Link]\n\nThank you for your prompt help!\n\nBest,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:50.619311",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-08-31T00:14:50.619311",
+          "timestamp": "2026-08-30T19:29:43.898947",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1011",
@@ -254,16 +330,17 @@
       "action_taken": "retry_soon",
       "recovery_email": {
         "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b91,999.00 didn't go through because your bank's payment gateway is currently down.\n\nDon't worry, your order is safe! Please try completing the payment again shortly using the link below:\n\n[Retry Payment Link]\n\nLet us know if you need any help.\n\nWarm regards,\n[Company Name]"
+        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b91999.00 didn't go through because your bank's payment gateway is currently experiencing a temporary outage.\n\nNo worries at all! Please feel free to retry your payment soon when the service is back up.\n\nIf you need any assistance, we're here to help.\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:14:55.684279",
+          "timestamp": "2026-08-30T19:29:49.098293",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1012",
@@ -272,22 +349,18 @@
       "error_reason": "incorrect_otp",
       "action_taken": "retry_immediately",
       "recovery_email": {
-        "subject": "Action needed: Payment unsuccessful for your recent order",
-        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b9999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014it happens! You can retry your payment immediately to complete your order.\n\n[Retry Payment Now]\n\nIf you have any questions, we're here to help.\n\nWarmly,\nCustomer Support Team"
+        "subject": "Action needed: Payment for your recent order",
+        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b9999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014it happens! Please try your payment again when you are ready using the link below:\n\n[Retry Payment Immediately]\n\nIf you have any questions or need assistance, we're always here to help.\n\nWarmly,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:00.680819",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-08-30T18:20:00.680819",
+          "timestamp": "2026-08-30T19:29:54.405588",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1013",
@@ -297,16 +370,17 @@
       "action_taken": "retry_immediately",
       "recovery_email": {
         "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Rohan Mehta,\n\nWe noticed your recent payment of \u20b91499.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014it happens! You can easily complete your purchase by retrying the payment immediately using the link below:\n\n[Retry Payment]\n\nLet us know if you need any help.\n\nBest regards,\nSupport Team"
+        "body": "Hi Rohan Mehta,\n\nWe noticed your recent payment of \u20b91499.00 was unsuccessful because the OTP entered was incorrect. \n\nNo worries\u2014it happens! You can retry your payment immediately to secure your order:\n\n[Retry Payment Now]\n\nIf you need any assistance, feel free to reach out.\n\nWarm regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:05.807299",
+          "timestamp": "2026-08-30T19:29:59.448598",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1014",
@@ -316,16 +390,17 @@
       "action_taken": "retry_immediately",
       "recovery_email": {
         "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b91999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014it happens! You can easily complete your purchase by retrying the payment right away. \n\n[Retry Payment Now]\n\nIf you need any help, just reply to this email. We're here for you!\n\nBest,\n[Your Company Name]"
+        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b91999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014you can easily complete your purchase now by retrying your payment. \n\n[Retry Payment Here]\n\nIf you have any questions, just let us know. We're happy to help!\n\nBest,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:11.799055",
+          "timestamp": "2026-08-30T19:30:04.693674",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1015",
@@ -335,26 +410,27 @@
       "action_taken": "retry_later",
       "recovery_email": {
         "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b92999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all! Please feel free to retry the transaction a little later when you're ready, or use a different payment method.\n\nIf you need any help, we're always here for you.\n\nBest regards,\nSupport Team"
+        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b92999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all! Please feel free to retry the payment a little later using your preferred card or payment method.\n\nIf you need any help, we are always here for you.\n\nWarm regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:16.947562",
+          "timestamp": "2026-08-30T19:30:09.832447",
           "outcome": "still_failed"
         },
         {
           "attempt": 2,
-          "timestamp": "2026-08-31T06:15:16.947562",
+          "timestamp": "2026-08-31T07:30:09.832447",
           "outcome": "still_failed"
         },
         {
           "attempt": 3,
-          "timestamp": "2026-08-31T18:15:16.947562",
+          "timestamp": "2026-08-31T19:30:09.832447",
           "outcome": "still_failed"
         }
       ],
-      "final_status": "unrecovered"
+      "final_status": "unrecovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1016",
@@ -364,21 +440,27 @@
       "action_taken": "retry_later",
       "recovery_email": {
         "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Rohan,\n\nWe tried to process your payment of \u20b91999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all\u2014these things happen! We recommend waiting a little while and trying your payment again when you're ready.\n\nIf you need any help, just let us know.\n\nBest regards,\nThe Team"
+        "body": "Hi Rohan,\n\nWe tried to process your payment of \u20b91999.00, but unfortunately, it was declined by your card issuer.\n\nNo worries at all! Please wait a little while and try retrying the payment when you're ready. You can easily update or retry your payment from your account dashboard.\n\nIf you need any help, just let us know.\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:22.097104",
+          "timestamp": "2026-08-30T19:30:15.087050",
           "outcome": "still_failed"
         },
         {
           "attempt": 2,
-          "timestamp": "2026-08-31T06:15:22.097104",
-          "outcome": "recovered"
+          "timestamp": "2026-08-31T07:30:15.087050",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "timestamp": "2026-08-31T19:30:15.087050",
+          "outcome": "still_failed"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "unrecovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1017",
@@ -388,16 +470,27 @@
       "action_taken": "request_new_payment_method",
       "recovery_email": {
         "subject": "Action required: Update your payment method for your recent order",
-        "body": "Hi Aarav,\n\nWe tried processing your payment of \u20b91999.00, but it looks like your card has expired.\n\nTo keep your subscription/order active, please update your payment details using a different card at your earliest convenience:\n\n[Update Payment Method]\n\nIf you have any questions or need assistance, just reply to this email. We're happy to help!\n\nBest regards,\nThe Team"
+        "body": "Hi Aarav,\n\nWe tried to process your payment of \u20b91,999.00, but it looks like your card has expired. \n\nTo keep everything running smoothly, could you please update your payment method? You can easily add a new card by clicking the link below:\n\n[Update Payment Method]\n\nIf you have any questions or need assistance, just let us know. We're happy to help!\n\nBest regards,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:27.373611",
-          "outcome": "recovered"
+          "timestamp": "2026-08-30T19:30:20.131373",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-31T01:30:20.131373",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "timestamp": "2026-08-31T07:30:20.131373",
+          "outcome": "still_failed"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "unrecovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1018",
@@ -407,16 +500,27 @@
       "action_taken": "retry_later",
       "recovery_email": {
         "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Priya,\n\nWe tried processing your payment of \u20b91,999.00, but it was unfortunately declined by your card issuer.\n\nNo worries at all! Please wait a little while and try updating your payment details when you're ready. You can easily complete the transaction here: [Payment Link].\n\nLet us know if you need any help!\n\nBest regards,\nCustomer Support Team"
+        "body": "Hi Priya,\n\nWe tried processing your payment of \u20b91999.00, but it was declined by your card issuer. No worries\u2014these things happen!\n\nCould you please try the payment again later using the same card or a different payment method?\n\nIf you need any help, just let us know. We're here for you.\n\nWarmly,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:33.218720",
-          "outcome": "recovered"
+          "timestamp": "2026-08-30T19:30:25.503803",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-31T07:30:25.503803",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "timestamp": "2026-08-31T19:30:25.503803",
+          "outcome": "still_failed"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "unrecovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1019",
@@ -425,17 +529,18 @@
       "error_reason": "expired_card",
       "action_taken": "request_new_payment_method",
       "recovery_email": {
-        "subject": "Action needed: Update your payment method for \u20b9999.00",
-        "body": "Hi Sneha,\n\nWe tried to process your recent payment of \u20b9999.00, but it looks like your card has expired.\n\nTo keep your service running smoothly, could you please take a moment to update your payment details with a new card?\n\nYou can easily update it here: [Link]\n\nThanks so much for your help!\n\nBest regards,\nThe Team"
+        "subject": "Action required: Update your payment method for \u20b9999.00",
+        "body": "Hi Sneha,\n\nWe tried to process your payment of \u20b9999.00, but it looks like your card has expired.\n\nTo keep your service running smoothly, please update your payment details by adding a new card at your earliest convenience.\n\n[Link to Update Payment]\n\nThanks for being with us,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:38.549797",
+          "timestamp": "2026-08-30T19:30:30.780671",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1020",
@@ -445,16 +550,17 @@
       "action_taken": "request_new_payment_method",
       "recovery_email": {
         "subject": "Action required: Update your payment method for \u20b91999.00",
-        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b91999.00, but it looks like your card has expired.\n\nTo keep your service running smoothly, please take a moment to update your payment details with a new card:\n\n[Update Payment Method]\n\nIf you have any questions or need help, just reply to this email. We're happy to assist!\n\nBest,\nThe Team"
+        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b91999.00, but it looks like your card has expired.\n\nTo keep your service uninterrupted, please take a moment to update your payment details by adding a new card. You can easily do this through your account settings.\n\nIf you have any questions or need assistance, just let us know. We're happy to help!\n\nBest regards,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:43.909775",
+          "timestamp": "2026-08-30T19:30:36.007201",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1021",
@@ -464,16 +570,17 @@
       "action_taken": "retry_immediately",
       "recovery_email": {
         "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Ishita,\n\nWe noticed your recent payment of \u20b91999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014it happens! Please retry your payment immediately to secure your order:\n\n[Insert Payment Link]\n\nIf you need any help, just reply to this email. We're here for you!\n\nBest,\n[Your Company Name]"
+        "body": "Hi Ishita,\n\nWe noticed your recent payment of \u20b91999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014it happens! You can easily complete your purchase by retrying your payment right away.\n\n[Retry Payment Link]\n\nIf you need any help, just let us know.\n\nBest,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:49.184714",
+          "timestamp": "2026-08-30T19:30:41.258481",
           "outcome": "recovered"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1022",
@@ -482,27 +589,28 @@
       "error_reason": "insufficient_funds",
       "action_taken": "retry_later",
       "recovery_email": {
-        "subject": "Action needed: Payment for your recent order failed",
-        "body": "Hi Ishita,\n\nWe tried processing your payment of \u20b92,999.00, but your bank declined it due to insufficient funds.\n\nNo worries at all! Please ensure your account has sufficient balance and feel free to retry the payment whenever you are ready.\n\nIf you need any help, just let us know.\n\nBest regards,\nSupport Team"
+        "subject": "Action needed: Payment for your recent order",
+        "body": "Hi Ishita,\n\nWe tried processing your payment of \u20b92,999.00, but your bank declined it due to insufficient funds.\n\nNo worries at all! Please add funds or use a different payment method when you have a moment, and feel free to retry the transaction later.\n\nLet us know if you need any help.\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:54.448905",
+          "timestamp": "2026-08-30T19:30:46.582347",
           "outcome": "still_failed"
         },
         {
           "attempt": 2,
-          "timestamp": "2026-08-31T06:15:54.448905",
+          "timestamp": "2026-08-31T07:30:46.582347",
           "outcome": "still_failed"
         },
         {
           "attempt": 3,
-          "timestamp": "2026-08-31T18:15:54.448905",
+          "timestamp": "2026-08-31T19:30:46.582347",
           "outcome": "still_failed"
         }
       ],
-      "final_status": "unrecovered"
+      "final_status": "unrecovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1023",
@@ -511,27 +619,18 @@
       "error_reason": "incorrect_otp",
       "action_taken": "retry_immediately",
       "recovery_email": {
-        "subject": "Action needed: Payment failed for your recent order",
-        "body": "Hi Rohan,\n\nWe noticed your recent payment of \u20b9499.00 didn't go through because the OTP entered was incorrect.\n\nNo worries at all! You can easily retry the payment right away to complete your purchase. \n\nIf you need any help, just reply to this email. We're here for you!\n\nBest,\n[Company Name]"
+        "subject": "Action needed: Payment update for your recent purchase",
+        "body": "Hi Rohan,\n\nWe noticed your recent payment of \u20b9499.00 didn't go through because the OTP entered was incorrect. \n\nNo worries at all\u2014accidents happen! You can easily retry your payment right away to complete your order.\n\n[Retry Payment Now]\n\nIf you need any help, just reply to this email.\n\nWarmly,\nCustomer Support"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:15:59.851440",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-08-30T18:20:59.851440",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-08-30T18:25:59.851440",
-          "outcome": "still_failed"
+          "timestamp": "2026-08-30T19:30:53.611283",
+          "outcome": "recovered"
         }
       ],
-      "final_status": "unrecovered"
+      "final_status": "recovered",
+      "data_source": "simulated"
     },
     {
       "payment_id": "pay_test1024",
@@ -541,16 +640,27 @@
       "action_taken": "retry_soon",
       "recovery_email": {
         "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b92999.00 didn't go through because your bank's payment gateway is temporarily down.\n\nNo worries at all\u2014these technical glitches happen! Could you please try retrying the payment soon? If you run into any trouble, just let us know and we'll be happy to help.\n\nBest regards,\nThe Team"
+        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b92999.00 didn't go through because your bank's payment gateway is temporarily down.\n\nNo worries at all! Please feel free to retry the payment soon using the link below once your bank is back up.\n\n[Retry Payment Link]\n\nThanks for your patience,\n[Your Company Name]"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-08-30T18:16:05.306548",
-          "outcome": "recovered"
+          "timestamp": "2026-08-30T19:30:58.736497",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "timestamp": "2026-08-30T21:30:58.736497",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "timestamp": "2026-08-30T23:30:58.736497",
+          "outcome": "still_failed"
         }
       ],
-      "final_status": "recovered"
+      "final_status": "unrecovered",
+      "data_source": "simulated"
     }
   ]
 }

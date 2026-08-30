@@ -23,6 +23,8 @@ ACTION_MAP = {
     "expired_card": {"action": "request_new_payment_method", "success_prob": 0.55},
     "issuer_unavailable": {"action": "retry_soon", "success_prob": 0.60},
     "incorrect_otp": {"action": "retry_immediately", "success_prob": 0.70},
+    "payment_failed": {"action": "retry_later", "success_prob": 0.40},
+    "international_transaction_not_allowed": {"action": "request_new_payment_method", "success_prob": 0.50},
 }
 
 # How far apart retries happen, depending on the action type.
@@ -108,7 +110,17 @@ def simulate_recovery_attempts(payment):
 
 def main():
     with open("../data/failed_payments.json", "r") as f:
-        failed_payments = json.load(f)
+        simulated_payments = json.load(f)
+    for p in simulated_payments:
+        p["data_source"] = "simulated"
+
+    try:
+        with open("../data/real_failed_payments.json", "r") as f:
+            real_payments = json.load(f)
+    except FileNotFoundError:
+        real_payments = []
+
+    failed_payments = real_payments + simulated_payments
 
     results = []
     recovered_count = 0
@@ -134,6 +146,7 @@ def main():
             "recovery_email": email,
             "attempts": attempts_log,
             "final_status": "recovered" if recovered else "unrecovered",
+            "data_source": payment.get("data_source", "simulated"),
         })
 
         time.sleep(4)  # small delay to stay well within free-tier rate limits

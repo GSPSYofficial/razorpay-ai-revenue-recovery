@@ -1,0 +1,36 @@
+[
+  {
+    "id": "pay_TW0ExudYOqzeL7",
+    "amount": 49900,
+    "currency": "INR",
+    "status": "failed",
+    "method": "card",
+    "customer_name": "Real Test Customer 1",
+    "customer_email": "realtest1@example.com",
+    "created_at": "2026-08-30T00:00:00",
+    "error_code": "BAD_REQUEST_ERROR",
+    "error_description": "International cards are not supported. Please contact our support team for help",
+    "error_reason": "international_transaction_not_allowed",
+    "error_source": "business",
+    "error_step": "payment_initiation",
+    "data_source": "real_razorpay_test_api",
+    "razorpay_order_id": "order_TW0AoKCYo9JKUB"
+  },
+  {
+    "id": "pay_TW0K4mXKldNsbf",
+    "amount": 49900,
+    "currency": "INR",
+    "status": "failed",
+    "method": "card",
+    "customer_name": "Real Test Customer 2",
+    "customer_email": "realtest2@example.com",
+    "created_at": "2026-08-30T00:05:00",
+    "error_code": "BAD_REQUEST_ERROR",
+    "error_description": "Payment failed",
+    "error_reason": "payment_failed",
+    "error_source": "gateway",
+    "error_step": "payment_authorization",
+    "data_source": "real_razorpay_test_api",
+    "razorpay_order_id": "order_TW0AoKCYo9JKUB"
+  }
+]

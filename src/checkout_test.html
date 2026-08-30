@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Checkout — Revenue Recovery Project</title>
+</head>
+<body>
+    <h2>Test Payment</h2>
+    <button id="pay-btn">Pay ₹499.00</button>
+    <pre id="output" style="background:#f0f0f0; padding:10px; margin-top:20px; white-space:pre-wrap;"></pre>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        document.getElementById('pay-btn').onclick = function () {
+            var options = {
+                "key": "rzp_test_TSX1xsIrorEOS4",
+                "amount": "49900",
+                "currency": "INR",
+                "name": "Revenue Recovery Test",
+                "description": "Test transaction for failure simulation",
+                "order_id": "order_TW0AoKCYo9JKUB",
+                "handler": function (response) {
+                    document.getElementById('output').innerText =
+                        "SUCCESS:\n" + JSON.stringify(response, null, 2);
+                },
+                "theme": { "color": "#3399cc" }
+            };
+            var rzp = new Razorpay(options);
+
+            rzp.on('payment.failed', function (response) {
+                document.getElementById('output').innerText =
+                    "FAILURE (copy this):\n" + JSON.stringify(response.error, null, 2);
+            });
+
+            rzp.open();
+        };
+    </script>
+</body>
+</html>
