@@ -27,6 +27,16 @@ ACTION_MAP = {
     "international_transaction_not_allowed": {"action": "request_new_payment_method", "success_prob": 0.50},
 }
 
+LOW_VALUE_THRESHOLD = 99900  # ₹999.00, in paise
+
+def get_max_attempts(amount):
+    """Cost-aware retry cap: low-value payments get fewer retries, since the
+    cost of repeated attempts (customer friction, gateway overhead) may
+    outweigh the amount recovered."""
+    if amount < LOW_VALUE_THRESHOLD:
+        return 1
+    return MAX_ATTEMPTS
+
 # How far apart retries happen, depending on the action type.
 # This reflects real dunning/retry practice — immediate issues (like OTP)
 # get retried within minutes, while bank/fund issues need more time to resolve.
@@ -85,15 +95,16 @@ Keep the body under 80 words. Be warm but concise. Don't be pushy."""
 
 
 def simulate_recovery_attempts(payment):
-    """Simulate retry attempts up to MAX_ATTEMPTS, spaced realistically, stopping on success."""
+    """Simulate retry attempts up to a cost-aware cap, spaced realistically, stopping on success."""
     config = ACTION_MAP[payment["error_reason"]]
     spacing = RETRY_SPACING[config["action"]]
+    max_attempts = get_max_attempts(payment["amount"])
     attempts_log = []
     recovered = False
 
     attempt_time = datetime.now()
 
-    for attempt_num in range(1, MAX_ATTEMPTS + 1):
+    for attempt_num in range(1, max_attempts + 1):
         success = random.random() < config["success_prob"]
         attempts_log.append({
             "attempt": attempt_num,
@@ -102,10 +113,10 @@ def simulate_recovery_attempts(payment):
         })
         if success:
             recovered = True
-            break  # stopping rule: don't keep retrying once recovered
-        attempt_time += spacing  # schedule next attempt realistically in the future
+            break
+        attempt_time += spacing
 
-    return recovered, attempts_log
+    return recovered, attempts_log, max_attempts
 
 
 def main():
@@ -131,7 +142,7 @@ def main():
 
         action = ACTION_MAP[payment["error_reason"]]["action"]
         email = generate_recovery_email(payment)
-        recovered, attempts_log = simulate_recovery_attempts(payment)
+        recovered, attempts_log, max_attempts_used = simulate_recovery_attempts(payment)
 
         if recovered:
             recovered_count += 1
@@ -143,6 +154,7 @@ def main():
             "amount": payment["amount"],
             "error_reason": payment["error_reason"],
             "action_taken": action,
+            "retry_cap_applied": max_attempts_used,
             "recovery_email": email,
             "attempts": attempts_log,
             "final_status": "recovered" if recovered else "unrecovered",
