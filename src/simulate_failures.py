@@ -42,6 +42,13 @@ FAILURE_TYPES = [
         "error_source": "customer",
         "error_step": "payment_authentication",
     },
+    {
+        "error_code": "GATEWAY_ERROR",
+        "error_description": "This transaction was flagged for suspected fraudulent activity and requires manual review.",
+        "error_reason": "suspected_fraud",
+        "error_source": "business",
+        "error_step": "risk_screening",
+    },
 ]
 
 CUSTOMER_NAMES = ["Aarav Sharma", "Priya Nair", "Rohan Mehta", "Sneha Iyer",
