@@ -10,20 +10,24 @@ from policy import evaluate, RETRY_SPACING
 
 load_dotenv()
 
-# Simulation-only: how likely a given failure reason is to resolve if the
-# execution layer's chosen action is carried out. This is NOT used by the
-# AI or the policy layer to make decisions — it only drives what happens
-# in our simulated outcome, since we don't have real gateway responses.
+# Simulation-only: how likely a given failure reason is to resolve if RETRIED
+# (not requested-new-method — that has its own separate model below). This is
+# NOT used by the AI or policy layer to make decisions — it only drives what
+# happens in our simulated outcome, since we don't have real gateway responses.
 SIMULATED_SUCCESS_PROB = {
     "insufficient_funds": 0.35,
     "card_declined": 0.30,
-    "expired_card": 0.55,
+    "expired_card": 0.10,  # low: retrying the SAME expired card rarely helps
     "issuer_unavailable": 0.60,
     "incorrect_otp": 0.70,
     "payment_failed": 0.40,
-    "international_transaction_not_allowed": 0.50,
+    "international_transaction_not_allowed": 0.10,
     "suspected_fraud": 0.0,  # never auto-retried; see policy.py
 }
+
+# Simulation-only, for the request_new_payment_method workflow specifically.
+CUSTOMER_UPDATE_PROB = 0.45      # chance the customer responds & updates on a given reminder
+NEW_METHOD_SUCCESS_PROB = 0.85   # chance a payment succeeds once a genuinely new method is used
 
 
 def generate_recovery_email(payment, ai_diagnosis, final_action):
@@ -55,12 +59,79 @@ Keep the body under 80 words. Be warm but concise. Don't be pushy."""
         }
 
 
+def execute_retry_flow(payment, final_action, max_attempts):
+    """Bounded retry loop for actions that retry the SAME payment method
+    (retry_immediately, retry_soon, retry_later)."""
+    spacing = RETRY_SPACING[final_action]
+    success_prob = SIMULATED_SUCCESS_PROB.get(payment["error_reason"], 0.3)
+    attempts_log = []
+    attempt_time = datetime.now()
+
+    for attempt_num in range(1, max_attempts + 1):
+        success = random.random() < success_prob
+        attempts_log.append({
+            "attempt": attempt_num,
+            "type": "payment_retry",
+            "timestamp": attempt_time.isoformat(),
+            "outcome": "recovered" if success else "still_failed",
+        })
+        if success:
+            return "recovered", attempts_log, None
+        attempt_time += spacing
+
+    return "escalated", attempts_log, f"Retries exhausted ({max_attempts} attempts) without recovery."
+
+
+def execute_payment_method_update_flow(payment, max_reminders):
+    """
+    Distinct from a retry: this simulates ASKING the customer to provide a
+    new payment method, rather than retrying the failed one. Recovery here
+    depends on whether the customer responds and updates their method — not
+    on retrying the same failed method again. This is deliberately a
+    different workflow, logged with different event types, so the audit
+    trail doesn't conflate 'we retried' with 'we asked the customer to act'.
+    """
+    spacing = RETRY_SPACING["request_new_payment_method"]
+    attempts_log = []
+    reminder_time = datetime.now()
+
+    for reminder_num in range(1, max_reminders + 1):
+        customer_updated = random.random() < CUSTOMER_UPDATE_PROB
+        attempts_log.append({
+            "attempt": reminder_num,
+            "type": "payment_method_update_request",
+            "timestamp": reminder_time.isoformat(),
+            "outcome": "customer_updated_method" if customer_updated else "no_response",
+        })
+
+        if customer_updated:
+            # Customer provided a new method -> simulate one fresh payment
+            # attempt with it. This is a genuinely different attempt, not
+            # a retry of the original failed method.
+            payment_succeeds = random.random() < NEW_METHOD_SUCCESS_PROB
+            attempts_log.append({
+                "attempt": reminder_num,
+                "type": "payment_attempt_with_new_method",
+                "timestamp": reminder_time.isoformat(),
+                "outcome": "recovered" if payment_succeeds else "still_failed",
+            })
+            if payment_succeeds:
+                return "recovered", attempts_log, None
+            else:
+                return ("escalated", attempts_log,
+                        "Customer provided a new payment method, but the payment still failed.")
+
+        reminder_time += spacing
+
+    return ("escalated", attempts_log,
+            f"Customer did not respond to {max_reminders} payment-method update request(s).")
+
+
 def execute_recovery(payment, policy_decision):
     """
     Deterministically executes the strategy the policy layer approved.
     Returns (final_status, attempts_log, escalation_reason_or_None).
-    This is where 'observe result, decide recovered/retry/escalate/stop'
-    actually happens — no further AI calls here, by design.
+    No further AI calls here, by design — the AI's role ends at diagnosis.
     """
     final_action = policy_decision["final_action"]
     max_attempts = policy_decision["max_attempts"]
@@ -72,26 +143,11 @@ def execute_recovery(payment, policy_decision):
     if final_action == "no_action":
         return "no_action", [], None
 
-    # Remaining actions (retry_immediately, retry_soon, retry_later,
-    # request_new_payment_method) all execute as a bounded retry loop.
-    spacing = RETRY_SPACING[final_action]
-    success_prob = SIMULATED_SUCCESS_PROB.get(payment["error_reason"], 0.3)
-    attempts_log = []
-    attempt_time = datetime.now()
+    if final_action == "request_new_payment_method":
+        return execute_payment_method_update_flow(payment, max_attempts)
 
-    for attempt_num in range(1, max_attempts + 1):
-        success = random.random() < success_prob
-        attempts_log.append({
-            "attempt": attempt_num,
-            "timestamp": attempt_time.isoformat(),
-            "outcome": "recovered" if success else "still_failed",
-        })
-        if success:
-            return "recovered", attempts_log, None
-        attempt_time += spacing
-
-    # Attempts exhausted without success — stop automated recovery, escalate.
-    return "escalated", attempts_log, f"Retries exhausted ({max_attempts} attempts) without recovery."
+    # Remaining actions all retry the SAME payment method.
+    return execute_retry_flow(payment, final_action, max_attempts)
 
 
 def process_payment(payment):
@@ -164,8 +220,8 @@ def main():
         "recovery_rate_pct": round(recovered_count / len(failed_payments) * 100, 1),
         "total_amount_recovered_rupees": total_amount_recovered / 100,
         "generated_at": datetime.now().isoformat(),
-        "note": "Recovery outcomes are simulated (SIMULATED_SUCCESS_PROB), "
-                "not observed from real gateway responses.",
+        "note": "Recovery outcomes are simulated (SIMULATED_SUCCESS_PROB / "
+                "CUSTOMER_UPDATE_PROB), not observed from real gateway responses.",
     }
 
     escalation_queue = [

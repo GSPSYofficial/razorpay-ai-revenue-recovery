@@ -6,9 +6,9 @@
     "no_action_count": 0,
     "unrecovered_other_count": 0,
     "recovery_rate_pct": 59.7,
-    "total_amount_recovered_rupees": 52963.0,
-    "generated_at": "2026-09-02T16:58:32.659229",
-    "note": "Recovery outcomes are simulated (SIMULATED_SUCCESS_PROB), not observed from real gateway responses."
+    "total_amount_recovered_rupees": 57963.0,
+    "generated_at": "2026-09-02T17:38:30.291912",
+    "note": "Recovery outcomes are simulated (SIMULATED_SUCCESS_PROB / CUSTOMER_UPDATE_PROB), not observed from real gateway responses."
   },
   "results": [
     {
@@ -18,10 +18,10 @@
       "error_reason": "international_transaction_not_allowed",
       "data_source": "real_razorpay_test_api",
       "ai_diagnosis": {
-        "diagnosis": "The payment failed because the card used is an international card, which is not supported by the payment gateway.",
+        "diagnosis": "The payment failed because the customer used an international card which is not supported by the current payment gateway.",
         "recommended_action": "request_new_payment_method",
         "confidence": 1.0,
-        "reasoning": "Retrying the same international card will not succeed, so the customer must use a supported domestic payment method."
+        "reasoning": "Retrying the same international card will not succeed, so the customer must provide a supported domestic payment method."
       },
       "policy_decision": {
         "proposed_action": "request_new_payment_method",
@@ -32,17 +32,24 @@
       },
       "recovery_email": {
         "subject": "Action needed: Update payment method for your recent order",
-        "body": "Hi Real Test Customer 1,\n\nWe noticed your recent payment of \u20b9499.00 failed because international cards are currently not supported by our payment gateway.\n\nTo complete your purchase, please reply to this email or contact our support team so we can assist you with an alternative payment method.\n\nThank you for your patience and understanding!\n\nBest regards,\nSupport Team"
+        "body": "Hi Real Test Customer 1,\n\nWe noticed your recent payment of \u20b9499.00 was unsuccessful because international cards are currently not supported by our payment gateway.\n\nCould you please update your payment method using a supported card so we can complete your transaction? If you need any assistance, please reach out to our support team.\n\nThank you for your patience and understanding!\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-09-02T16:52:01.742499",
-          "outcome": "recovered"
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:27:09.057228",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:27:09.057228",
+          "outcome": "still_failed"
         }
       ],
-      "final_status": "recovered",
-      "escalation_reason": null
+      "final_status": "escalated",
+      "escalation_reason": "Customer provided a new payment method, but the payment still failed."
     },
     {
       "payment_id": "pay_TW0K4mXKldNsbf",
@@ -51,10 +58,10 @@
       "error_reason": "payment_failed",
       "data_source": "real_razorpay_test_api",
       "ai_diagnosis": {
-        "diagnosis": "The card payment failed due to an unspecified generic error.",
+        "diagnosis": "The card payment failed due to an unspecified generic error code.",
         "recommended_action": "retry_immediately",
         "confidence": 0.6,
-        "reasoning": "Generic card payment failures are frequently transient issues that succeed upon an immediate retry."
+        "reasoning": "Generic payment failures are frequently transient issues that can succeed upon an immediate retry."
       },
       "policy_decision": {
         "proposed_action": "retry_immediately",
@@ -66,1920 +73,48 @@
         "was_overridden": false
       },
       "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Real Test Customer 2,\n\nWe noticed your recent payment of \u20b9499.00 couldn't be processed due to a temporary error with your card. \n\nDon't worry\u2014we are automatically attempting to retry the charge for you right now. If the retry isn't successful, you may just need to update your payment details. \n\nThanks for your patience!\n\nBest,\nThe Team"
+        "subject": "Action needed: Update your payment for \u20b9499.00",
+        "body": "Hi Real Test Customer 2,\n\nWe tried processing your payment of \u20b9499.00, but unfortunately, it didn't go through due to a generic card error. \n\nNo worries\u2014we are automatically retrying the payment right now. If it still doesn't go through, you can easily update your payment details by logging into your account. \n\nThanks for your patience!\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-09-02T16:52:03.935697",
-          "outcome": "recovered"
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:27:11.451942",
+          "outcome": "still_failed"
         }
       ],
-      "final_status": "recovered",
-      "escalation_reason": null
+      "final_status": "escalated",
+      "escalation_reason": "Retries exhausted (1 attempts) without recovery."
     },
     {
       "payment_id": "pay_test1000",
-      "customer_name": "Divya Reddy",
-      "amount": 199900,
-      "error_reason": "suspected_fraud",
+      "customer_name": "Karan Malhotra",
+      "amount": 99900,
+      "error_reason": "insufficient_funds",
       "data_source": "simulated",
       "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was flagged for suspected fraudulent activity by the system, triggering a manual review.",
-        "recommended_action": "escalate_to_human",
+        "diagnosis": "The UPI payment of \u20b9999.00 failed because the customer's bank account lacks sufficient funds to complete the transaction.",
+        "recommended_action": "retry_later",
         "confidence": 0.95,
-        "reasoning": "Because the transaction requires manual security review due to fraud suspicions, automated retries are inappropriate and human intervention is necessary."
+        "reasoning": "Since the decline is due to insufficient funds, the customer needs time to deposit money before a retry can succeed."
       },
       "policy_decision": {
-        "proposed_action": "escalate_to_human",
+        "proposed_action": "retry_later",
         "final_action": "escalate_to_human",
         "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
+        "policy_notes": [
+          "Overrode AI recommendation 'retry_later': attempts already exhausted (3); escalating."
+        ],
+        "was_overridden": true
       },
       "recovery_email": null,
       "attempts": [],
       "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
+      "escalation_reason": "Overrode AI recommendation 'retry_later': attempts already exhausted (3); escalating."
     },
     {
       "payment_id": "pay_test1001",
-      "customer_name": "Karan Malhotra",
-      "amount": 149900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the customer's bank account did not have enough funds to cover the transaction.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to insufficient funds, the customer needs time to deposit money before a retry can succeed."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b91,499.00 couldn't be completed because your bank declined the transaction due to insufficient funds.\n\nNo worries at all! We will automatically retry the payment in a little while, or you can update your payment method whenever you're ready.\n\nThanks,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:52:07.378194",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-03T04:52:07.378194",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T16:52:07.378194",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1002",
-      "customer_name": "Sneha Iyer",
-      "amount": 299900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the underlying card issuer declined the transaction.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.95,
-        "reasoning": "Since the issuer declined the card linked to the UPI transaction, simply retrying the same method will likely result in another failure, so the user should use a different payment method."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment for \u20b92999.00",
-        "body": "Hi Sneha,\n\nWe tried to process your payment of \u20b92999.00, but it was declined by your card issuer. \n\nNo worries\u2014things happen! To keep your account active, please update your payment method or try a different one at your earliest convenience.\n\n[Update Payment Method]\n\nThanks,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:52:09.766472",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T22:52:09.766472",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1003",
-      "customer_name": "Karan Malhotra",
-      "amount": 49900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and requires manual intervention.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 1.0,
-        "reasoning": "Since the payment was blocked due to suspected fraud requiring manual review, automated retries are inappropriate and the case must be escalated."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 1,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1004",
-      "customer_name": "Karan Malhotra",
-      "amount": 149900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to a simple user input error with the OTP, the user can immediately attempt the payment again by entering the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Payment update for your recent order",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b91499.00 failed because the OTP entered was incorrect. No worries at all\u2014mistakes happen!\n\nWe are automatically retrying the transaction for you right now, so you don't need to do anything. If you'd prefer to complete it manually or need any help, just let us know.\n\nBest regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:52:12.938827",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1005",
-      "customer_name": "Sneha Iyer",
-      "amount": 149900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was declined by the card issuer, indicating a bank-side refusal.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.85,
-        "reasoning": "Since the issuer explicitly declined the transaction, retrying the same payment method is likely to fail again and requires the user to use a different payment option."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Update your payment method for \u20b91499.00",
-        "body": "Hi Sneha,\n\nWe tried to process your payment of \u20b91499.00, but your bank declined the transaction. This is usually due to a temporary bank-side restriction.\n\nTo complete your order, please use a new payment method by updating your details here: [Insert Link].\n\nIf you need any help, just reply to this email. We're here for you!\n\nBest regards,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:52:15.123428",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T22:52:15.123428",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1006",
-      "customer_name": "Karan Malhotra",
-      "amount": 99900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the card issuer declined the payment.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.95,
-        "reasoning": "Since the issuer explicitly declined the transaction, retrying the same payment method is unlikely to succeed without a different form of payment."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment method for \u20b9999.00",
-        "body": "Hi Karan,\n\nWe tried processing your payment of \u20b9999.00, but unfortunately, your card issuer declined the transaction.\n\nTo keep your service running smoothly, could you please update your payment method or try a different card? You can easily complete the update here: [Link].\n\nReach out if you need any help!\n\nBest,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:52:17.297141",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T22:52:17.297141",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1007",
-      "customer_name": "Arjun Kapoor",
-      "amount": 149900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment of \u20b91499.00 was blocked and flagged for suspected fraudulent activity, requiring manual security review.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 1.0,
-        "reasoning": "Since the transaction is flagged for suspected fraud, automated retries are inappropriate and human intervention is required to clear or investigate the security block."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1008",
-      "customer_name": "Rohan Mehta",
-      "amount": 49900,
-      "error_reason": "issuer_unavailable",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is currently experiencing downtime.",
-        "recommended_action": "retry_soon",
-        "confidence": 0.95,
-        "reasoning": "Since the issue is a temporary bank-side outage, waiting a couple of hours for the gateway to recover is the best approach before attempting the transaction again."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_soon",
-        "final_action": "retry_soon",
-        "max_attempts": 1,
-        "policy_notes": [
-          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
-        ],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Payment update for your recent order",
-        "body": "Hi Rohan,\n\nWe noticed your recent payment of \u20b9499.00 couldn't be processed because your bank's UPI gateway is temporarily down.\n\nDon't worry\u2014we're automatically going to retry the payment soon once the bank services are back up. You don't need to do anything right now. \n\nThanks for your patience!\n\nBest,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:53:22.477071",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1009",
-      "customer_name": "Rohan Mehta",
-      "amount": 299900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was declined by the customer's issuing bank because the account lacks sufficient funds to cover the \u20b92999.00 charge.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the decline is due to insufficient funds, the customer needs time to deposit money before a retry can be successful."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Payment update for your recent order",
-        "body": "Hi Rohan,\n\nWe tried processing your payment of \u20b92999.00, but it was unfortunately declined by your bank due to insufficient funds.\n\nNo worries at all! We will automatically retry the transaction later. Alternatively, you can update your payment method or add funds at your earliest convenience.\n\nLet us know if you need any help.\n\nWarm regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:53:24.755489",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-03T04:53:24.755489",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T16:53:24.755489",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1010",
-      "customer_name": "Karan Malhotra",
-      "amount": 149900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card payment failed because the customer entered an incorrect OTP.",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is simply due to a mistyped OTP, the user should be prompted to try the transaction again immediately with the correct code."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment unsuccessful for your recent order",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b91499.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014we are attempting to retry the payment immediately so your order isn't delayed. If prompted, please enter the correct OTP to complete the transaction.\n\nThank you,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:53:26.835452",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1011",
-      "customer_name": "Aarav Sharma",
-      "amount": 149900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the customer entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure was simply due to a mistyped OTP, the customer can immediately attempt the payment again with the correct code."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Aarav,\n\nWe noticed your recent UPI payment of \u20b91499.00 didn't go through because the OTP entered was incorrect. No worries at all!\n\nYou can easily complete your purchase by trying again. We are ready to process your order immediately once the payment is successful.\n\nClick here to retry: [Payment Link]\n\nWarm regards,\nCustomer Support Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:53:29.015414",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1012",
-      "customer_name": "Karan Malhotra",
-      "amount": 99900,
-      "error_reason": "issuer_unavailable",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card payment failed because the issuing bank's payment gateway is currently down and unavailable.",
-        "recommended_action": "retry_soon",
-        "confidence": 0.95,
-        "reasoning": "Since the bank-side outage is typically temporary, retrying within a couple of hours allows time for the system to recover without requiring user intervention."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_soon",
-        "final_action": "retry_soon",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Quick update regarding your recent payment",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b9999.00 couldn't go through because your bank's payment gateway is temporarily down. \n\nNo action is needed on your part right now\u2014we will automatically retry the payment for you shortly. If you prefer to use a different payment method, you can do so anytime from your account dashboard. \n\nThanks for your patience!\n\nBest regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:53:31.086672",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1013",
-      "customer_name": "Rohan Mehta",
-      "amount": 49900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the customer's bank account did not have enough balance to cover the \u20b9499.00 amount.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to insufficient funds, the customer needs time to deposit money before a retry can succeed."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 1,
-        "policy_notes": [
-          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
-        ],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent transaction",
-        "body": "Hi Rohan,\n\nWe noticed your recent payment of \u20b9499.00 couldn't be completed, as your bank declined the transaction due to insufficient funds.\n\nNo worries at all! We will automatically retry the payment in a little while, or you can update your payment method whenever you're ready.\n\nThanks,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:53:33.267959",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1014",
-      "customer_name": "Arjun Kapoor",
-      "amount": 99900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was flagged by security systems for suspected fraudulent activity, necessitating a manual review.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 0.95,
-        "reasoning": "Because the transaction is explicitly held for suspected fraud and manual review, automated retries are inappropriate and human intervention is required."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1015",
-      "customer_name": "Ishita Sen",
-      "amount": 99900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The transaction failed because the customer entered an incorrect One-Time Password (OTP) during card authentication.",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to a simple user input error rather than a permanent card or bank issue, the customer can safely retry the payment right away with the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for your recent order of \u20b9999.00",
-        "body": "Hi Ishita,\n\nWe noticed your recent payment of \u20b9999.00 didn't go through because the OTP entered was incorrect. No worries, it happens!\n\nWe are automatically retrying the transaction for you right now, so you don't need to do anything. If you'd prefer to complete it manually or need any help, just let us know.\n\nWarmly,\nCustomer Support"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:53:36.479589",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T16:58:36.479589",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1016",
-      "customer_name": "Aarav Sharma",
-      "amount": 49900,
-      "error_reason": "expired_card",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The payment failed because the provided card has expired, despite the method being listed as UPI.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 1.0,
-        "reasoning": "Since the underlying card is expired, retrying the same payment method will not work and the user must provide a valid payment method."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 1,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Update your payment method for \u20b9499.00",
-        "body": "Hi Aarav,\n\nWe tried to process your payment of \u20b9499.00, but it looks like the card on file has expired.\n\nCould you please take a moment to update your payment method? You can easily add a new card or use an alternative payment option by clicking the link below.\n\n[Update Payment Method]\n\nThanks for your prompt help!\n\nBest,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:19.169916",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1017",
-      "customer_name": "Sneha Iyer",
-      "amount": 99900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment of \u20b9999.00 failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to a simple user input error (incorrect OTP), the transaction can be safely retried immediately with the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for \u20b9999.00 was unsuccessful",
-        "body": "Hi Sneha,\n\nWe noticed your recent UPI payment of \u20b9999.00 couldn't go through because the OTP entered was incorrect. \n\nNo worries\u2014mistakes happen! You can easily retry your payment right away by clicking the link below. \n\n[Retry Payment Now]\n\nIf you need any help, just let us know.\n\nWarm regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:21.425618",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1018",
-      "customer_name": "Priya Nair",
-      "amount": 149900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was declined by the card issuer, indicating a potential issue with authorization or card status.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.9,
-        "reasoning": "Since the issuer explicitly declined the transaction, attempting the same payment method again is unlikely to succeed without resolution."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Update your payment method for \u20b91499.00",
-        "body": "Hi Priya,\n\nWe tried processing your payment of \u20b91499.00, but it was unfortunately declined by your card issuer. This usually happens due to a temporary authorization or card status issue.\n\nTo ensure uninterrupted service, please take a moment to update your payment method or try a different card using the link below:\n\n[Update Payment Method]\n\nThank you,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:23.533615",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1019",
-      "customer_name": "Karan Malhotra",
-      "amount": 49900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is solely due to a user input error (incorrect OTP), the customer can immediately attempt the payment again with the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 1,
-        "policy_notes": [
-          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
-        ],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for \u20b9499.00 was unsuccessful",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b9499.00 didn't go through because the OTP entered was incorrect. No worries, these things happen! \n\nWe are automatically retrying the transaction now. If you'd prefer to complete it manually, you can do so anytime using the link below. \n\nThank you,\n[Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:25.773485",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1020",
-      "customer_name": "Arjun Kapoor",
-      "amount": 99900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the underlying card issuer declined the transaction.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.95,
-        "reasoning": "Since the issuer explicitly declined the card linked to the UPI transaction, simply retrying the same method will likely result in another failure."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Payment update needed for your recent order",
-        "body": "Hi Arjun,\n\nWe tried to process your payment of \u20b9999.00, but it was unfortunately declined by your card issuer via UPI. \n\nNo worries at all! Could you please update your payment method so we can complete your order? You can easily try a different card or payment option here: [Insert Link].\n\nThanks,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:27.844359",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T22:54:27.844359",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T04:54:27.844359",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1021",
-      "customer_name": "Priya Nair",
-      "amount": 199900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The transaction was flagged by security systems for suspected fraudulent activity, necessitating manual intervention.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 0.95,
-        "reasoning": "Since the transaction is flagged for suspected fraud and requires manual review, automated retries are inappropriate and human intervention is necessary."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1022",
-      "customer_name": "Divya Reddy",
-      "amount": 199900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card transaction failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure was simply due to a mistyped OTP, the user can successfully complete the transaction immediately by entering the correct OTP on a new attempt."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b91,999.00 didn't go through because the OTP entered was incorrect. No worries at all\u2014these things happen!\n\nWe are ready to retry the transaction immediately, or you can complete it securely by clicking the link below whenever you're ready.\n\n[Complete Payment Link]\n\nThank you,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:31.272712",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1023",
-      "customer_name": "Divya Reddy",
-      "amount": 49900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment of \u20b9499.00 failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to a simple user input error (incorrect OTP), the customer can safely attempt the UPI payment again right away with the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 1,
-        "policy_notes": [
-          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
-        ],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for \u20b9499.00 unsuccessful",
-        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b9499.00 didn't go through because an incorrect UPI OTP was entered. \n\nNo worries\u2014we are ready to retry the transaction immediately so you can complete your purchase without hassle. \n\nPlease click below to try again whenever you're ready.\n\nWarmly,\nCustomer Support"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:33.350781",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1024",
-      "customer_name": "Divya Reddy",
-      "amount": 99900,
-      "error_reason": "expired_card",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The customer's card has passed its expiration date and cannot be processed.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 1.0,
-        "reasoning": "Retrying an expired card will consistently fail, so the customer must provide valid alternative payment details."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment method for \u20b9999.00",
-        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b9999.00, but it looks like your card has expired.\n\nCould you please take a moment to update your payment details with a new card? You can easily do this by logging into your account.\n\nLet us know if you need any help!\n\nBest,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:54:35.538163",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1025",
-      "customer_name": "Karan Malhotra",
-      "amount": 99900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure was simply due to a mistyped OTP, the user can safely attempt the payment again right away with the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for \u20b9999.00 did not go through",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b9999.00 for your order couldn't be completed because the OTP entered was incorrect. No worries, it happens!\n\nWe are automatically retrying the transaction now. If you'd prefer to complete it manually or use a different payment method, please visit your account dashboard.\n\nThank you,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:55:18.358618",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1026",
-      "customer_name": "Karan Malhotra",
-      "amount": 149900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is simply due to a mistyped OTP, the customer can easily attempt the payment again right away with the correct code."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your order",
-        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b91499.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014we are ready to retry the payment immediately, or you can complete it securely using the link below whenever you're ready.\n\n[Complete Payment]\n\nThank you for your patience!\n\nBest,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:55:20.541046",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1027",
-      "customer_name": "Rohan Mehta",
-      "amount": 99900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was flagged by security systems for suspected fraudulent activity and requires manual intervention.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 1.0,
-        "reasoning": "Transactions flagged for suspected fraud require manual review and cannot be resolved through automated retries."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1028",
-      "customer_name": "Rohan Mehta",
-      "amount": 199900,
-      "error_reason": "issuer_unavailable",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is temporarily down.",
-        "recommended_action": "retry_soon",
-        "confidence": 0.95,
-        "reasoning": "Since the bank-side outage is typically temporary, attempting the payment again after a couple of hours allows time for the system to recover."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_soon",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [
-          "Overrode AI recommendation 'retry_soon': attempts already exhausted (3); escalating."
-        ],
-        "was_overridden": true
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Overrode AI recommendation 'retry_soon': attempts already exhausted (3); escalating."
-    },
-    {
-      "payment_id": "pay_test1029",
-      "customer_name": "Rohan Mehta",
-      "amount": 299900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card issuer rejected the transaction, which typically indicates insufficient funds, spending limits, or a temporary bank-side security block.",
-        "recommended_action": "retry_later",
-        "confidence": 0.8,
-        "reasoning": "Giving the cardholder time to arrange funds or resolve the bank-side decline makes a delayed retry more likely to succeed than an immediate one."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Rohan,\n\nWe noticed your recent payment of \u20b92,999.00 was declined by your card issuer. This usually happens due to insufficient funds, spending limits, or a temporary bank security block.\n\nDon't worry\u2014we\u2019ll automatically retry the transaction shortly. If you'd like to update your payment method in the meantime, please feel free to reach out. \n\nBest regards,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:55:24.697565",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-03T04:55:24.697565",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T16:55:24.697565",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1030",
-      "customer_name": "Rohan Mehta",
-      "amount": 199900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card issuer rejected the transaction for the \u20b91999.00 payment.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.85,
-        "reasoning": "Since the bank explicitly declined the card, simply retrying the same method is likely to fail again and requires the user to provide an alternative payment source."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update payment method for your recent order",
-        "body": "Hi Rohan Mehta,\n\nWe noticed your recent payment of \u20b91999.00 was declined by your card issuer. No worries at all\u2014these things happen!\n\nTo complete your order, please update your payment method using the link below:\n\n[Update Payment Method]\n\nIf you need any assistance, feel free to reply to this email. \n\nBest regards,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:55:26.987481",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T22:55:26.987481",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T04:55:26.987481",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1031",
-      "customer_name": "Aarav Sharma",
-      "amount": 149900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is simply due to a mistyped OTP, the user should be prompted to try the payment again immediately with the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b91499.00 failed because the OTP entered was incorrect. \n\nNo worries\u2014we're trying to process the payment again right now. If prompted, please enter the correct OTP to complete your transaction.\n\nThank you for your patience!\n\nBest,\n[Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:55:29.375470",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T17:00:29.375470",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1032",
-      "customer_name": "Aarav Sharma",
-      "amount": 49900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment attempt failed because the transaction was declined by the card issuer.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.9,
-        "reasoning": "Since the issuer explicitly declined the transaction, simply retrying the same payment method is unlikely to succeed and requires the user to provide an alternative method."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 1,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update payment method for your recent transaction",
-        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b9499.00 was declined by your card issuer. No worries at all\u2014these things happen!\n\nTo keep everything running smoothly, could you please update your payment method or try a different UPI handle? You can easily complete your payment here: [Link].\n\nThanks for your prompt attention to this!\n\nBest,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:55:31.471623",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (1 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1033",
-      "customer_name": "Arjun Kapoor",
-      "amount": 99900,
-      "error_reason": "issuer_unavailable",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is currently experiencing downtime.",
-        "recommended_action": "retry_soon",
-        "confidence": 0.95,
-        "reasoning": "Since the issue is a temporary bank-side outage, waiting a couple of hours allows the issuing bank time to restore their gateway services before attempting the transaction again."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_soon",
-        "final_action": "retry_soon",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Payment update for your recent transaction",
-        "body": "Hi Arjun,\n\nWe noticed your recent payment of \u20b9999.00 couldn't go through because your bank's payment gateway is currently experiencing some downtime.\n\nNo action is needed from you right now. We will automatically retry the transaction shortly. If you prefer to complete it sooner, you can do so anytime from your account dashboard.\n\nThanks for your patience!\n\nBest regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:55:33.728785",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T18:55:33.728785",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1034",
-      "customer_name": "Arjun Kapoor",
-      "amount": 49900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The customer's card transaction for \u20b9499.00 was declined by the issuing bank due to a lack of available funds.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the decline was caused by insufficient funds, waiting allows the customer time to deposit money before attempting to charge the card again."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 1,
-        "policy_notes": [
-          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
-        ],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for \u20b9499.00 was unsuccessful",
-        "body": "Hi Arjun,\n\nWe tried processing your payment of \u20b9499.00, but it was declined by your bank due to insufficient funds.\n\nDon't worry, we'll automatically retry the transaction a bit later. If you'd prefer, you can also update your payment method anytime in your account settings.\n\nThanks,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:56:18.031387",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (1 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1035",
-      "customer_name": "Sneha Iyer",
-      "amount": 149900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and requires manual review.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 0.95,
-        "reasoning": "Since the transaction is flagged for suspected fraud and demands manual review, automated recovery attempts are inappropriate and a human agent must intervene."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1036",
-      "customer_name": "Rohan Mehta",
-      "amount": 299900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was declined by the card issuer, indicating a temporary or fund-related rejection by the bank.",
-        "recommended_action": "retry_soon",
-        "confidence": 0.85,
-        "reasoning": "Since it is a bank-side decline during netbanking, waiting a couple of hours for transient issues to resolve before retrying is the most appropriate automated step."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_soon",
-        "final_action": "retry_soon",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Rohan,\n\nWe noticed your recent payment of \u20b92,999.00 was declined by your card issuer. This is usually due to a temporary bank restriction or fund check. \n\nNo worries\u2014we'll automatically retry the transaction soon. Alternatively, you can update your payment details anytime via your account dashboard. \n\nThanks for your patience!\n\nBest,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:56:26.649418",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T18:56:26.649418",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-02T20:56:26.649418",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1037",
-      "customer_name": "Rohan Mehta",
-      "amount": 299900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card transaction for \u20b92999.00 was declined by the issuing bank because the account lacks sufficient funds.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the decline is due to insufficient funds, the customer needs time to deposit money before a retry can succeed."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent transaction",
-        "body": "Hi Rohan,\n\nWe tried to process your payment of \u20b92999.00, but it was unfortunately declined by your bank due to insufficient funds.\n\nNo worries at all! We will automatically retry the transaction in a little while. If you'd prefer, you can also update your payment method whenever you're ready.\n\nThank you for choosing us!\n\nBest regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:56:37.759596",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-03T04:56:37.759596",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1038",
-      "customer_name": "Priya Nair",
-      "amount": 299900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to a simple user input error (wrong OTP) rather than a technical or financial constraint, the user can safely attempt the payment again right away with the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Priya,\n\nWe noticed your recent payment of \u20b92,999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014we are automatically retrying the transaction right now so you don't have to lift a finger. \n\nIf the retry isn't successful, you can easily complete it anytime from your account dashboard. Thanks for your patience!\n\nBest,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:56:41.599991",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T17:01:41.599991",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1039",
-      "customer_name": "Divya Reddy",
-      "amount": 99900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the card issuer declined the payment authorization.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.9,
-        "reasoning": "Since the card issuer explicitly declined the transaction, retrying the same payment method is unlikely to succeed without a different form of payment."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment for \u20b9999.00",
-        "body": "Hi Divya,\n\nWe tried processing your recent payment of \u20b9999.00, but it was unfortunately declined by your card issuer. \n\nNo worries at all! To keep things running smoothly, could you please update your payment method or try a different card? \n\nYou can easily complete your transaction here: [Insert Link].\n\nThanks,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:56:45.849725",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T22:56:45.849725",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T04:56:45.849725",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1040",
-      "customer_name": "Rohan Mehta",
-      "amount": 49900,
-      "error_reason": "expired_card",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking payment failed because the underlying card used for the transaction has expired.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 1.0,
-        "reasoning": "Since the card has expired, retrying the same payment method will not succeed and the user must provide valid payment details."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 1,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment method for \u20b9499.00",
-        "body": "Hi Rohan,\n\nWe couldn't process your payment of \u20b9499.00 because the card on file has expired.\n\nCould you please update your payment details or use a different card? You can easily complete the transaction here: [Insert Link].\n\nLet us know if you need any help!\n\nBest regards,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:56:50.744236",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1041",
-      "customer_name": "Rohan Mehta",
-      "amount": 49900,
-      "error_reason": "expired_card",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The payment failed because the underlying card has expired, despite the method being initiated as UPI.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 1.0,
-        "reasoning": "Retrying the same expired payment method will inevitably fail again, so the user must provide a valid, active payment method to complete the transaction."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 1,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment method for \u20b9499.00",
-        "body": "Hi Rohan,\n\nWe tried processing your recent payment of \u20b9499.00, but it failed because the card linked to your UPI method has expired.\n\nCould you please take a moment to update your payment details with a new card? You can easily do this by logging into your account.\n\nLet us know if you need any help!\n\nBest regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:57:02.437273",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (1 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1042",
-      "customer_name": "Rohan Mehta",
-      "amount": 99900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card payment of \u20b9999.00 failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 1.0,
-        "reasoning": "Since the failure is solely due to a user input error with the OTP, the user can immediately attempt the payment again by entering the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [
-          "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
-        ],
-        "was_overridden": true
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
-    },
-    {
-      "payment_id": "pay_test1043",
-      "customer_name": "Sneha Iyer",
-      "amount": 99900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the customer's bank account did not have enough balance to cover the \u20b9999.00 transaction.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the decline was due to insufficient funds, the customer needs time to add money to their account before a retry can succeed."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Sneha,\n\nWe tried to process your payment of \u20b9999.00, but it was unfortunately declined by your bank due to insufficient funds.\n\nNo worries at all! We will automatically retry the transaction later once you've had a chance to top up your account. If you'd prefer to complete your payment now using a different method, you can do so anytime from your account dashboard.\n\nThank you,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:57:13.869615",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-03T04:57:13.869615",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1044",
-      "customer_name": "Rohan Mehta",
-      "amount": 299900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the customer's bank account lacks sufficient funds to cover the \u20b92999.00 charge.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the decline is due to insufficient funds, the customer needs time to deposit money before a retry can succeed."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Update payment for your recent order",
-        "body": "Hi Rohan,\n\nWe tried processing your payment of \u20b92999.00, but it looks like it was declined due to insufficient funds in your account. No worries at all!\n\nWe will automatically retry the transaction later. If you'd prefer, you can also update your payment method anytime in your account settings.\n\nThank you for choosing us!\n\nBest,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:57:16.045327",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-03T04:57:16.045327",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T16:57:16.045327",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1045",
-      "customer_name": "Arjun Kapoor",
-      "amount": 149900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI transaction was blocked by the gateway due to flagged suspected fraudulent activity requiring manual intervention.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 1.0,
-        "reasoning": "Fraud flags require manual review and security verification rather than automated payment retries."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1046",
-      "customer_name": "Sneha Iyer",
-      "amount": 199900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 1.0,
-        "reasoning": "Since the failure is due to a simple user input error of the OTP, the user can safely attempt the payment again immediately by entering the correct code."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment unsuccessful for your recent order",
-        "body": "Hi Sneha,\n\nWe noticed your recent payment of \u20b91,999.00 didn't go through because the OTP entered was incorrect. No worries, it happens! \n\nWe are going to retry the transaction immediately so you can complete your purchase without hassle.\n\nIf you prefer, you can also complete it anytime from your dashboard. Let us know if you need any help!\n\nWarm regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:57:19.678272",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T17:02:19.678272",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1047",
-      "customer_name": "Karan Malhotra",
-      "amount": 199900,
-      "error_reason": "card_declined",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction was declined by the card issuer, indicating a bank-side rejection.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 0.9,
-        "reasoning": "Since the issuer explicitly declined the transaction, attempting the same payment method again is likely to fail, so the customer should use an alternative payment option."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update payment for your recent order",
-        "body": "Hi Karan,\n\nWe tried processing your payment of \u20b91999.00, but it was unfortunately declined by your card issuer. To complete your order, could you please update your payment method or try a different card?\n\nYou can easily retry the payment here: [Link]\n\nLet us know if you need any assistance!\n\nBest regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:57:21.865825",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T22:57:21.865825",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 3,
-          "timestamp": "2026-09-03T04:57:21.865825",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1048",
-      "customer_name": "Rohan Mehta",
-      "amount": 49900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment of \u20b9499.00 failed because the issuing bank declined the transaction due to a lack of available funds in the customer's account.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is due to insufficient funds, immediate retries will fail, and the customer needs time to add funds before the payment can be successfully processed again."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 1,
-        "policy_notes": [
-          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
-        ],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Rohan,\n\nWe tried to process your payment of \u20b9499.00, but it was declined by your bank due to insufficient funds.\n\nNo worries at all! Please ensure your account has sufficient balance, and we will automatically retry the transaction later. You can also complete the payment anytime from your account dashboard.\n\nThank you,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:57:24.038242",
-          "outcome": "still_failed"
-        }
-      ],
-      "final_status": "escalated",
-      "escalation_reason": "Retries exhausted (1 attempts) without recovery."
-    },
-    {
-      "payment_id": "pay_test1049",
-      "customer_name": "Arjun Kapoor",
-      "amount": 49900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure is solely due to a user input error during authentication, the user can successfully complete the payment by simply re-entering the correct OTP right away."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "escalate_to_human",
-        "max_attempts": 1,
-        "policy_notes": [
-          "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
-        ],
-        "was_overridden": true
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
-    },
-    {
-      "payment_id": "pay_test1050",
-      "customer_name": "Karan Malhotra",
-      "amount": 199900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and requires manual intervention.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 1.0,
-        "reasoning": "Transactions flagged for suspected fraud cannot be resolved through automated retries and require manual review by support or risk teams."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1051",
-      "customer_name": "Priya Nair",
-      "amount": 99900,
-      "error_reason": "expired_card",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The netbanking payment failed because the underlying card used for the transaction has expired.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 1.0,
-        "reasoning": "Since the card has expired, retrying the same payment method will not succeed and the user must provide a valid payment method."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment method for \u20b9999.00",
-        "body": "Hi Priya,\n\nWe tried processing your payment of \u20b9999.00, but it looks like the card linked to your account has expired. \n\nTo ensure uninterrupted service, could you please update your payment details by adding a new card? You can easily do this through your account settings.\n\nThank you for your prompt attention to this!\n\nBest regards,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:57:28.410741",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1052",
-      "customer_name": "Ishita Sen",
-      "amount": 299900,
-      "error_reason": "incorrect_otp",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the customer entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.95,
-        "reasoning": "Since the failure was simply due to a mistyped OTP, the user can safely attempt the payment again right away by entering the correct OTP."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Quick update on your recent payment",
-        "body": "Hi Ishita,\n\nWe tried processing your payment of \u20b92,999.00, but it didn't go through because the UPI OTP entered was incorrect. \n\nNo worries\u2014we are automatically retrying the transaction for you now. If prompted on your UPI app, please enter the correct OTP to complete your order.\n\nThank you for your patience!\n\nBest,\nSupport Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:58:14.724991",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T17:03:14.724991",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1053",
-      "customer_name": "Arjun Kapoor",
-      "amount": 299900,
-      "error_reason": "expired_card",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The payment failed because the card used for the transaction has expired, despite the payment method being listed as UPI.",
-        "recommended_action": "request_new_payment_method",
-        "confidence": 1.0,
-        "reasoning": "Since the underlying card has expired, retrying the payment with the same details will not work and the user must provide a valid payment method."
-      },
-      "policy_decision": {
-        "proposed_action": "request_new_payment_method",
-        "final_action": "request_new_payment_method",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action required: Update your payment method for \u20b92999.00",
-        "body": "Hi Arjun,\n\nWe couldn't process your recent payment of \u20b92999.00 because the card on file has expired. (Note: Even if you usually use UPI, please ensure your active card details are updated).\n\nTo keep your service uninterrupted, please take a moment to add a new payment method:\n\n[Update Payment Method Link]\n\nThanks,\nThe Team"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:58:19.789083",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1054",
-      "customer_name": "Divya Reddy",
-      "amount": 149900,
-      "error_reason": "suspected_fraud",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card transaction was flagged as suspected fraudulent activity and requires manual review.",
-        "recommended_action": "escalate_to_human",
-        "confidence": 0.95,
-        "reasoning": "Fraud flags and transactions requiring manual review cannot be resolved through automated retries and must be handled by human intervention."
-      },
-      "policy_decision": {
-        "proposed_action": "escalate_to_human",
-        "final_action": "escalate_to_human",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": null,
-      "attempts": [],
-      "final_status": "escalated",
-      "escalation_reason": "Escalated at initial diagnosis."
-    },
-    {
-      "payment_id": "pay_test1055",
-      "customer_name": "Arjun Kapoor",
-      "amount": 299900,
-      "error_reason": "insufficient_funds",
-      "data_source": "simulated",
-      "ai_diagnosis": {
-        "diagnosis": "The card transaction for \u20b92999.00 failed because the customer's issuing bank declined it due to insufficient funds.",
-        "recommended_action": "retry_later",
-        "confidence": 0.95,
-        "reasoning": "Since the decline is due to insufficient funds, the customer needs time to deposit money before the payment can be successfully reattempted."
-      },
-      "policy_decision": {
-        "proposed_action": "retry_later",
-        "final_action": "retry_later",
-        "max_attempts": 3,
-        "policy_notes": [],
-        "was_overridden": false
-      },
-      "recovery_email": {
-        "subject": "Action needed: Payment update for your recent order",
-        "body": "Hi Arjun,\n\nWe tried processing your payment of \u20b92999.00, but your bank declined the transaction due to insufficient funds.\n\nNo worries at all! We will automatically retry the payment in a little while, or you can update your payment method whenever you're ready.\n\nIf you need any help, just let us know.\n\nBest,\n[Your Company Name]"
-      },
-      "attempts": [
-        {
-          "attempt": 1,
-          "timestamp": "2026-09-02T16:58:23.021743",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-03T04:58:23.021743",
-          "outcome": "recovered"
-        }
-      ],
-      "final_status": "recovered",
-      "escalation_reason": null
-    },
-    {
-      "payment_id": "pay_test1056",
       "customer_name": "Karan Malhotra",
       "amount": 99900,
       "error_reason": "expired_card",
@@ -1999,12 +134,65 @@
       },
       "recovery_email": {
         "subject": "Action required: Update your payment method for \u20b9999.00",
-        "body": "Hi Karan,\n\nWe tried processing your recent payment of \u20b9999.00, but it looks like the card on file has expired.\n\nTo keep your service uninterrupted, please take a moment to update your payment details using a new card at your earliest convenience.\n\n[Update Payment Method Button/Link]\n\nIf you have any questions or need assistance, just reply to this email. We're happy to help!\n\nBest regards,\nThe Team"
+        "body": "Hi Karan,\n\nWe tried processing your payment of \u20b9999.00, but it looks like the card on file has expired.\n\nTo keep your service running smoothly, please take a moment to update your payment details using a new card:\n\n[Update Payment Method]\n\nIf you have any questions, we're here to help.\n\nBest,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-09-02T16:58:25.085610",
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:27:21.739148",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:27:21.739148",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-03T05:27:21.739148",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-03T05:27:21.739148",
+          "outcome": "still_failed"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Customer provided a new payment method, but the payment still failed."
+    },
+    {
+      "payment_id": "pay_test1002",
+      "customer_name": "Arjun Kapoor",
+      "amount": 149900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is solely due to a user input error for the OTP, the customer can easily attempt the payment again right away with the correct code."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment for \u20b91499.00 unsuccessful",
+        "body": "Hi Arjun,\n\nWe noticed your recent payment of \u20b91499.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014we are automatically retrying the payment for you right now. If it fails again, you can easily update your details or try a different payment method by visiting your account dashboard.\n\nThanks for your patience!\n\nBest,\nThe Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:27:29.643159",
           "outcome": "recovered"
         }
       ],
@@ -2012,16 +200,108 @@
       "escalation_reason": null
     },
     {
-      "payment_id": "pay_test1057",
-      "customer_name": "Ishita Sen",
-      "amount": 99900,
+      "payment_id": "pay_test1003",
+      "customer_name": "Aarav Sharma",
+      "amount": 149900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment failed because the underlying card issuer declined the transaction.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the issuer has explicitly declined the card linked to the UPI transaction, retrying the same payment method is likely to fail again and requires the user to provide an alternative method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Update your payment method for \u20b91499.00",
+        "body": "Hi Aarav,\n\nWe tried processing your payment of \u20b91499.00, but it was declined by your card issuer. \n\nNo worries\u2014it happens! Could you please update your payment method so we can complete your transaction?\n\n[Update Payment Method Link]\n\nThanks,\nThe Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:27:38.889122",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:27:38.889122",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-03T05:27:38.889122",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-03T05:27:38.889122",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1004",
+      "customer_name": "Sneha Iyer",
+      "amount": 199900,
+      "error_reason": "insufficient_funds",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card transaction for \u20b91999.00 was declined by the issuing bank because the account lacks sufficient funds.",
+        "recommended_action": "retry_later",
+        "confidence": 0.95,
+        "reasoning": "Since the decline is due to insufficient funds, the customer needs time to deposit money before a retry can succeed."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_later",
+        "final_action": "retry_later",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Payment update needed for your recent order",
+        "body": "Hi Sneha,\n\nWe noticed your recent payment of \u20b91999.00 was declined by your bank due to insufficient funds. No worries at all\u2014we know these things happen! \n\nWe will automatically retry the transaction later, or you can update your payment method whenever you're ready. \n\nIf you have any questions, we're here to help.\n\nWarm regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:27:50.124184",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-03T05:27:50.124184",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1005",
+      "customer_name": "Priya Nair",
+      "amount": 199900,
       "error_reason": "issuer_unavailable",
       "data_source": "simulated",
       "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is currently experiencing downtime.",
+        "diagnosis": "The issuing bank's payment gateway is currently down, preventing the netbanking transaction from being processed.",
         "recommended_action": "retry_soon",
         "confidence": 0.95,
-        "reasoning": "Since the issue is a temporary bank-side outage, waiting a couple of hours before retrying gives the bank time to restore its services."
+        "reasoning": "Since the bank-side outage is typically temporary, waiting a couple of hours before retrying the same netbanking method gives the bank time to restore service."
       },
       "policy_decision": {
         "proposed_action": "retry_soon",
@@ -2031,18 +311,14 @@
         "was_overridden": false
       },
       "recovery_email": {
-        "subject": "Action needed: Payment for \u20b9999.00 could not be processed",
-        "body": "Hi Ishita,\n\nWe tried processing your payment of \u20b9999.00, but it failed because your bank's payment gateway is currently experiencing downtime.\n\nDon't worry, you don't need to do anything right now. We will automatically retry the payment soon. If you'd prefer to complete it manually, feel free to visit your account.\n\nThank you for your patience!\n\nBest,\n[Your Company Name]"
+        "subject": "We couldn't process your payment for \u20b91999.00",
+        "body": "Hi Priya,\n\nWe tried to process your payment of \u20b91999.00, but it failed because your bank's payment gateway is currently down.\n\nDon't worry, you don't need to do anything right now. We will automatically retry the transaction very soon once the issue is resolved.\n\nThank you for your patience!\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-09-02T16:58:27.266903",
-          "outcome": "still_failed"
-        },
-        {
-          "attempt": 2,
-          "timestamp": "2026-09-02T18:58:27.266903",
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:28:02.319673",
           "outcome": "recovered"
         }
       ],
@@ -2050,20 +326,92 @@
       "escalation_reason": null
     },
     {
-      "payment_id": "pay_test1058",
-      "customer_name": "Karan Malhotra",
-      "amount": 49900,
-      "error_reason": "incorrect_otp",
+      "payment_id": "pay_test1006",
+      "customer_name": "Divya Reddy",
+      "amount": 99900,
+      "error_reason": "card_declined",
       "data_source": "simulated",
       "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the customer entered an incorrect One-Time Password (OTP).",
-        "recommended_action": "retry_immediately",
-        "confidence": 0.99,
-        "reasoning": "Since the failure was merely due to a mistyped OTP, the user can easily correct it and retry the payment right away."
+        "diagnosis": "The card issuer declined the transaction for \u20b9999.00 without a specific permanent error code.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.8,
+        "reasoning": "A generic card decline is often caused by a temporary bank-side issue or glitch, making a delayed retry worthwhile before asking the user for a new payment method."
       },
       "policy_decision": {
-        "proposed_action": "retry_immediately",
-        "final_action": "retry_immediately",
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent transaction",
+        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b9999.00, but your card issuer declined the transaction. This sometimes happens due to temporary bank restrictions.\n\nDon't worry\u2014we will automatically retry the payment soon. If you'd like to update your payment details or use a different card in the meantime, you can do so here: [Link].\n\nThanks,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:28:21.647771",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T19:28:21.647771",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T21:28:21.647771",
+          "outcome": "still_failed"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Retries exhausted (3 attempts) without recovery."
+    },
+    {
+      "payment_id": "pay_test1007",
+      "customer_name": "Rohan Mehta",
+      "amount": 299900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction failed because the issuing bank's payment gateway is temporarily offline.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the bank-side outage is typically temporary, waiting a couple of hours allows time for the issuing bank's gateway to recover before attempting the netbanking payment again."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [
+          "Overrode AI recommendation 'retry_soon': attempts already exhausted (3); escalating."
+        ],
+        "was_overridden": true
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Overrode AI recommendation 'retry_soon': attempts already exhausted (3); escalating."
+    },
+    {
+      "payment_id": "pay_test1008",
+      "customer_name": "Sneha Iyer",
+      "amount": 49900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The issuing bank's payment gateway is temporarily down, preventing authorization of the card transaction.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the bank-side outage is typically temporary, retrying the payment within a couple of hours allows time for the issuing bank's systems to recover."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
         "max_attempts": 1,
         "policy_notes": [
           "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
@@ -2071,13 +419,14 @@
         "was_overridden": false
       },
       "recovery_email": {
-        "subject": "Action needed: Payment of \u20b9499.00 unsuccessful",
-        "body": "Hi Karan,\n\nWe noticed your recent UPI payment of \u20b9499.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014we are ready to try the payment again whenever you are. Please click below to retry your transaction securely.\n\n[Retry Payment]\n\nThanks,\nTeam"
+        "subject": "Action required: Payment for your recent transaction",
+        "body": "Hi Sneha,\n\nWe noticed your recent payment of \u20b9499.00 couldn't be processed because your bank's payment gateway is temporarily down.\n\nDon't worry\u2014we will automatically retry the transaction soon once the bank's services are restored. You don't need to take any action right now. \n\nThank you for your patience!\n\nBest regards,\nSupport Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-09-02T16:58:29.447935",
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:28:25.886918",
           "outcome": "recovered"
         }
       ],
@@ -2085,16 +434,779 @@
       "escalation_reason": null
     },
     {
-      "payment_id": "pay_test1059",
+      "payment_id": "pay_test1009",
       "customer_name": "Sneha Iyer",
+      "amount": 99900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI transaction was blocked by security systems due to suspected fraudulent activity.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 0.95,
+        "reasoning": "Fraud flags require manual review and human intervention, making automated retry or alternative recovery actions inappropriate."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1010",
+      "customer_name": "Divya Reddy",
+      "amount": 149900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction failed because the issuing bank's payment gateway is temporarily offline.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the bank-side outage is usually temporary, retrying after a couple of hours allows time for the issuing bank's gateway to recover."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Update on your recent payment for \u20b91499.00",
+        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b91499.00 couldn't go through because your bank's payment gateway is temporarily offline.\n\nDon't worry\u2014we will automatically retry the transaction for you shortly. You don't need to take any action right now.\n\nThanks for your patience!\n\nBest,\n[Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:28:48.551107",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T19:28:48.551107",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1011",
+      "customer_name": "Aarav Sharma",
+      "amount": 99900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction was flagged for suspected fraudulent activity, triggering a security hold that necessitates human intervention.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 0.99,
+        "reasoning": "Because the transaction requires manual security review due to suspected fraud, automated retries are inappropriate and the case must be escalated.",
+        "risk_mitigation": "Review transaction details and customer history manually to clear the security flag before attempting any further charges."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1012",
+      "customer_name": "Divya Reddy",
+      "amount": 49900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is temporarily down.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the issue is on the bank's side, waiting a couple of hours for their gateway to recover is the best approach before attempting the transaction again."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 1,
+        "policy_notes": [
+          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
+        ],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment for \u20b9499.00 could not be processed",
+        "body": "Hi Divya,\n\nWe tried processing your payment of \u20b9499.00, but it didn't go through because your bank's UPI payment gateway is temporarily down.\n\nDon't worry\u2014we will automatically retry the payment soon once the banking network is back up. You don't need to take any action right now.\n\nThank you for your patience!\n\nBest,\n[Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:29:01.127445",
+          "outcome": "still_failed"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Retries exhausted (1 attempts) without recovery."
+    },
+    {
+      "payment_id": "pay_test1013",
+      "customer_name": "Karan Malhotra",
+      "amount": 99900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The transaction failed because the user entered an incorrect One-Time Password (OTP) during card authentication.",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is simply due to a mistyped OTP, the user can safely attempt the payment again right away by entering the correct code."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment for \u20b9999.00 unsuccessful",
+        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b9999.00 didn't go through because the OTP entered was incorrect.\n\nNo worries\u2014it happens! We are trying the transaction again right now so you don't have to lift a finger. \n\nIf you prefer to complete it manually, you can do so anytime from your account dashboard. Let us know if you need any help.\n\nBest,\nThe Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:29:03.202547",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1014",
+      "customer_name": "Karan Malhotra",
+      "amount": 149900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking payment failed because the underlying card linked to or attempted during the transaction has expired.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Since the failure is due to an expired card, retrying the same payment method will not succeed and the user must provide valid payment details."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment method for \u20b91499.00",
+        "body": "Hi Karan,\n\nWe couldn't process your recent payment of \u20b91499.00 because the card on file has expired. \n\nNo worries\u2014things like this happen! Could you please take a moment to update your payment method so we can complete your transaction?\n\n[Update Payment Method Button/Link]\n\nThanks,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:29:07.050066",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:29:07.050066",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1015",
+      "customer_name": "Divya Reddy",
+      "amount": 199900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and requires manual review.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 1.0,
+        "reasoning": "Because the transaction requires manual review due to fraud suspicion, automated retries are inappropriate and human intervention is necessary."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1016",
+      "customer_name": "Ishita Sen",
+      "amount": 49900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The payment failed because the card used for the transaction has expired, despite the method being listed as UPI.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Since the underlying issue is an expired card, retrying the same payment method will not succeed and the user must provide valid payment details."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 1,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment method for \u20b9499.00",
+        "body": "Hi Ishita,\n\nWe tried processing your payment of \u20b9499.00, but it didn't go through because the card on file has expired.\n\nCould you please take a moment to update your payment details or use a different card? You can easily complete the transaction here: [Link].\n\nLet us know if you need any help!\n\nBest,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:29:10.048074",
+          "outcome": "no_response"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Customer did not respond to 1 payment-method update request(s)."
+    },
+    {
+      "payment_id": "pay_test1017",
+      "customer_name": "Priya Nair",
+      "amount": 99900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card issuer declined the transaction, indicating a potential issue with the card or account status at the moment of payment.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.85,
+        "reasoning": "Since the issuer explicitly declined the card, simply retrying the same method is likely to fail again, so the customer should provide an alternative payment method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update payment method for your recent transaction",
+        "body": "Hi Priya,\n\nWe tried processing your payment of \u20b9999.00, but unfortunately, it was declined by your card issuer. This usually happens due to a temporary account status or card issue.\n\nTo ensure uninterrupted service, could you please update your payment method? You can easily do so by logging into your account.\n\nLet us know if you need any help!\n\nBest regards,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:29:12.231332",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:29:12.231332",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T23:29:12.231332",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1018",
+      "customer_name": "Aarav Sharma",
       "amount": 199900,
       "error_reason": "issuer_unavailable",
       "data_source": "simulated",
       "ai_diagnosis": {
-        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is currently experiencing downtime.",
+        "diagnosis": "The netbanking transaction failed because the issuing bank's payment gateway is temporarily down.",
         "recommended_action": "retry_soon",
         "confidence": 0.95,
-        "reasoning": "Since the issue is a temporary bank-side outage, waiting a couple of hours allows the issuing bank time to restore their gateway services before attempting the transaction again."
+        "reasoning": "Since the bank-side outage is usually temporary, retrying within a couple of hours allows time for the system to recover without requiring a different payment method."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Payment for your recent order",
+        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b91999.00 failed because your bank's payment gateway is temporarily down.\n\nDon't worry\u2014we are automatically going to retry the transaction soon. If you'd prefer to complete it now using a different method, you can do so anytime from your account dashboard.\n\nThanks for your patience!\n\nBest,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:29:14.434142",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1019",
+      "customer_name": "Priya Nair",
+      "amount": 99900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure was solely due to a user input error with the OTP, the user can immediately attempt the payment again by entering the correct OTP."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment for \u20b9999.00 was unsuccessful",
+        "body": "Hi Priya,\n\nWe noticed your recent payment of \u20b9999.00 failed because the OTP entered was incorrect. No worries, these things happen! \n\nWe are going ahead and retrying your transaction immediately so you can complete your purchase without hassle.\n\nIf you have any questions or need assistance, we're here to help.\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:29:16.412657",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1020",
+      "customer_name": "Karan Malhotra",
+      "amount": 299900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction was flagged by security systems for suspected fraudulent activity, triggering a manual review.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 1.0,
+        "reasoning": "Because the transaction requires manual security review due to suspected fraud, automated retries are inappropriate and human intervention is necessary."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1021",
+      "customer_name": "Karan Malhotra",
+      "amount": 299900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card issuer rejected the transaction for the \u20b92999.00 payment.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the issuer explicitly declined the card, retrying the same payment method is unlikely to succeed without intervention from the cardholder."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment method for \u20b92999.00",
+        "body": "Hi Karan,\n\nWe tried to process your \u20b92999.00 payment, but it was unfortunately declined by your card issuer.\n\nTo ensure uninterrupted service, could you please update your payment method?\n\n[Link to Update Payment]\n\nThanks,\nThe Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:29:19.643692",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:29:19.643692",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1022",
+      "customer_name": "Priya Nair",
+      "amount": 149900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment attempt failed because the transaction was declined by the card issuer.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the issuer explicitly declined the transaction, retrying the same payment method is unlikely to succeed and requires the user to provide an alternative method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Payment failed for \u20b91499.00",
+        "body": "Hi Priya,\n\nWe noticed your recent payment of \u20b91499.00 failed because the transaction was declined by your card issuer.\n\nTo ensure uninterrupted service, please update your payment method or try a different UPI app when you have a moment.\n\n[Update Payment Method Link]\n\nThank you,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:29:21.730866",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:29:21.730866",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1023",
+      "customer_name": "Ishita Sen",
+      "amount": 199900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is currently down.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the bank-side issue is temporary, retrying after a couple of hours allows time for the issuing bank's systems to recover."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Ishita,\n\nWe noticed your recent UPI payment of \u20b91999.00 didn't go through because your bank's payment gateway is currently experiencing a temporary outage.\n\nDon't worry, we will automatically retry processing the payment for you soon. If you prefer, you can also complete your purchase anytime using a different payment method.\n\nThank you for your patience!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:29:25.122166",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1024",
+      "customer_name": "Divya Reddy",
+      "amount": 99900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The issuing bank's netbanking gateway is currently experiencing an outage, preventing transaction processing.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the bank-side gateway issue is usually temporary, retrying within a couple of hours allows sufficient time for the service to recover."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Quick update on your recent payment",
+        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b9999.00 didn't go through because your bank's netbanking gateway is currently experiencing a temporary outage.\n\nDon't worry\u2014we are automatically going to retry the transaction soon once the bank's services are restored. You don't need to take any action right now.\n\nThanks for your patience!\n\nBest,\nThe Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:30:32.121930",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1025",
+      "customer_name": "Arjun Kapoor",
+      "amount": 99900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The transaction failed because the payment method used was an expired card.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Since the card has expired, retrying the same payment method will not succeed and the user must provide valid payment details."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Update your payment method for \u20b9999.00",
+        "body": "Hi Arjun,\n\nWe tried to process your payment of \u20b9999.00, but it looks like the card on file has expired. \n\nTo keep things running smoothly, could you please take a moment to update your payment method with a new card? You can do so securely here: [Insert Link].\n\nThanks for your prompt help!\n\nBest,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:30:49.691562",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:30:49.691562",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T23:30:49.691562",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1026",
+      "customer_name": "Karan Malhotra",
+      "amount": 99900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment of \u20b9999.00 failed because the user entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 1.0,
+        "reasoning": "Since the failure is due to a simple user input error (incorrect OTP), the user can immediately try the payment again by entering the correct OTP."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment of \u20b9999.00 unsuccessful",
+        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b999.00 failed because the OTP entered was incorrect. No worries, it happens!\n\nYou can easily complete your transaction by trying again. We are retrying your payment immediately to get things sorted.\n\n[Retry Payment Now]\n\nThanks,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:31:07.038559",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1027",
+      "customer_name": "Divya Reddy",
+      "amount": 99900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction was declined by the card issuer, indicating a bank-side rejection.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the issuer explicitly declined the transaction, retrying the same payment method is likely to fail again and requires the user to use a different method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment method for \u20b9999.00",
+        "body": "Hi Divya,\n\nWe noticed your recent payment of \u20b9999.00 couldn't be processed because your card issuer declined the transaction.\n\nTo keep your service running smoothly, could you please update your payment method or use a different card? \n\nYou can easily complete the update here: [Insert Link].\n\nThanks for your prompt help!\n\nBest regards,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:31:36.039801",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:31:36.039801",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1028",
+      "customer_name": "Priya Nair",
+      "amount": 199900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The transaction was flagged by security systems for suspected fraudulent activity and requires manual review.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 1.0,
+        "reasoning": "Automated retries are inappropriate for security flags and manual intervention is required to review the transaction."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1029",
+      "customer_name": "Aarav Sharma",
+      "amount": 49900,
+      "error_reason": "insufficient_funds",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking payment of \u20b9499.00 failed because the issuing bank declined the transaction due to insufficient funds in the account.",
+        "recommended_action": "retry_later",
+        "confidence": 0.95,
+        "reasoning": "Since the decline was due to insufficient funds, the customer needs time to add money to their account before a retry can be successful."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_later",
+        "final_action": "retry_later",
+        "max_attempts": 1,
+        "policy_notes": [
+          "Low-value payment (<\u20b9999): retry cap reduced to 1 attempt."
+        ],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Aarav,\n\nWe tried to process your payment of \u20b9499.00, but it was declined by your bank due to insufficient funds. \n\nNo worries\u2014we will automatically retry the payment in a little while. In the meantime, you may want to ensure your account has sufficient funds, or you can update your payment method whenever you're ready.\n\nThanks,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:32:05.069610",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1030",
+      "customer_name": "Priya Nair",
+      "amount": 99900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking payment failed because the card used is expired.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Since the underlying card has expired, retrying the same payment method will continue to fail until updated."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Update your payment method for \u20b9999.00",
+        "body": "Hi Priya,\n\nWe tried to process your recent payment of \u20b9999.00, but it looks like the card on file has expired.\n\nTo keep your service running smoothly, please take a moment to update your payment details or use a different card by visiting your account settings.\n\nIf you have any questions or need help, just reply to this email. We're always happy to assist!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:32:23.043544",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:32:23.043544",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1031",
+      "customer_name": "Rohan Mehta",
+      "amount": 149900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment failed because the issuing bank's payment gateway is currently down.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the bank-side issue is temporary, retrying the transaction within a couple of hours allows time for the gateway to recover without requiring user intervention."
       },
       "policy_decision": {
         "proposed_action": "retry_soon",
@@ -2105,12 +1217,1011 @@
       },
       "recovery_email": {
         "subject": "Action needed: Payment for your recent order",
-        "body": "Hi Sneha,\n\nWe noticed your recent payment of \u20b91,999.00 couldn't go through because your bank's payment gateway is currently experiencing downtime.\n\nDon't worry\u2014we will automatically retry the transaction very soon. Alternatively, you can complete the payment anytime through your account dashboard.\n\nThank you for your patience!\n\nBest,\nThe Team"
+        "body": "Hi Rohan,\n\nWe noticed your recent payment of \u20b91499.00 didn't go through because your bank's payment gateway is currently down.\n\nDon't worry\u2014we will automatically retry the transaction for you soon. You don't need to do anything right now. \n\nIf you'd prefer to use a different payment method in the meantime, feel free to visit your account. Thanks for your patience!\n\nBest,\nThe Team"
       },
       "attempts": [
         {
           "attempt": 1,
-          "timestamp": "2026-09-02T16:58:31.619310",
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:32:53.184134",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1032",
+      "customer_name": "Arjun Kapoor",
+      "amount": 49900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The payment failed because the card has expired, despite the payment method being listed as UPI.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Since the underlying card is expired, retrying the same payment method will not succeed and the user must provide a valid payment method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 1,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment method for \u20b9499.00",
+        "body": "Hi Arjun,\n\nWe tried to process your payment of \u20b9499.00, but it looks like the card on file has expired (it seems a UPI method was linked to an expired card).\n\nCould you please take a moment to update your payment details? You can easily add a new card or use another preferred method using the link below.\n\n[Update Payment Method]\n\nThanks for your prompt help!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:33:09.824531",
+          "outcome": "no_response"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Customer did not respond to 1 payment-method update request(s)."
+    },
+    {
+      "payment_id": "pay_test1033",
+      "customer_name": "Priya Nair",
+      "amount": 149900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is due to a simple user input error, prompting the customer to try again right away with the correct OTP is the most effective and appropriate action."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment for your recent order",
+        "body": "Hi Priya,\n\nWe noticed your recent payment of \u20b91499.00 didn't go through because the OTP entered was incorrect. No worries, these things happen! We are attempting to retry the payment immediately. If prompted, please ensure you enter the correct OTP to complete your transaction.\n\nThank you,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:33:21.147404",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:38:21.147404",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1034",
+      "customer_name": "Priya Nair",
+      "amount": 299900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction failed because the card issuer declined the transaction.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the issuer explicitly declined the payment, retrying the same method is unlikely to succeed and the customer should use a different payment option."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Update your payment for \u20b92999.00",
+        "body": "Hi Priya,\n\nWe couldn't process your recent payment of \u20b92999.00 because your card issuer declined the transaction.\n\nTo ensure uninterrupted service, could you please update your payment method or use a different card?\n\n[Link: Update Payment Method]\n\nLet us know if you need any help!\n\nWarm regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:33:27.378602",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:33:27.378602",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1035",
+      "customer_name": "Aarav Sharma",
+      "amount": 49900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is simply due to a mistyped OTP, the customer can safely attempt the payment again immediately by entering the correct code."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "escalate_to_human",
+        "max_attempts": 1,
+        "policy_notes": [
+          "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
+        ],
+        "was_overridden": true
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
+    },
+    {
+      "payment_id": "pay_test1036",
+      "customer_name": "Priya Nair",
+      "amount": 49900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "A UPI payment failed because the underlying card issuer declined the transaction.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.95,
+        "reasoning": "Since the issuer explicitly declined the transaction, retrying the same method is likely to fail again and requires the user to provide an alternative payment method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 1,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update payment method for your \u20b9499.00 order",
+        "body": "Hi Priya,\n\nWe tried to process your payment of \u20b9499.00, but your card issuer declined the UPI transaction.\n\nTo complete your order, please use a different payment method at your earliest convenience. You can easily update your details here: [Insert Link].\n\nLet us know if you need any help!\n\nBest,\nThe Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:33:45.282118",
+          "outcome": "no_response"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Customer did not respond to 1 payment-method update request(s)."
+    },
+    {
+      "payment_id": "pay_test1037",
+      "customer_name": "Divya Reddy",
+      "amount": 149900,
+      "error_reason": "insufficient_funds",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment failed because the customer's bank account did not have enough balance to cover the amount.",
+        "recommended_action": "retry_later",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is due to insufficient funds, the customer needs time to deposit money before the transaction can succeed."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_later",
+        "final_action": "retry_later",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Payment update for your recent order",
+        "body": "Hi Divya,\n\nWe tried processing your payment of \u20b91499.00, but your bank declined the transaction due to insufficient funds.\n\nDon't worry, we'll automatically retry the transaction soon. Please ensure your account has the required balance, or feel free to use a different payment method whenever you're ready.\n\nThank you,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:33:47.505188",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-03T05:33:47.505188",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1038",
+      "customer_name": "Arjun Kapoor",
+      "amount": 299900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking payment failed because the underlying card linked to the transaction has expired.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Retrying with the same expired card will continue to fail, so the customer must provide a valid payment method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Update your payment method for \u20b92999.00",
+        "body": "Hi Arjun,\n\nWe tried processing your recent payment of \u20b92999.00, but it looks like the card linked to your account has expired. \n\nCould you please take a moment to update your payment details with a new card? You can easily do this by logging into your account.\n\nLet us know if you need any help!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:33:50.592128",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:33:50.592128",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T23:33:50.592128",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1039",
+      "customer_name": "Rohan Mehta",
+      "amount": 299900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and blocked pending manual review.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 0.95,
+        "reasoning": "Since the transaction is flagged for suspected fraud and requires manual review, automated recovery attempts are inappropriate and human intervention is necessary."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1040",
+      "customer_name": "Karan Malhotra",
+      "amount": 199900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card issuer declined the transaction for \u20b91999.00.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the issuer explicitly declined the card, retrying the same payment method is unlikely to succeed without alternative funding.",
+        "allowed_actions": [
+          "retry_immediately",
+          "retry_soon",
+          "retry_later",
+          "request_new_payment_method",
+          "escalate_to_human",
+          "no_action"
+        ]
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent transaction",
+        "body": "Hi Karan,\n\nWe tried to process your payment of \u20b91999.00, but it was unfortunately declined by your card issuer.\n\nTo ensure uninterrupted service, could you please update your payment method? You can easily do this by clicking the link below.\n\n[Update Payment Method]\n\nThank you for your prompt attention to this!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:34:27.389970",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:34:27.389970",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1041",
+      "customer_name": "Arjun Kapoor",
+      "amount": 49900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction was flagged for potential fraud and placed on hold for manual security review.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 1.0,
+        "reasoning": "Transactions flagged for suspected fraud require manual intervention and cannot be resolved through automated retries."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 1,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1042",
+      "customer_name": "Sneha Iyer",
+      "amount": 49900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is simply due to a mistyped OTP, the customer can safely attempt the payment again right away with the correct OTP."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "escalate_to_human",
+        "max_attempts": 1,
+        "policy_notes": [
+          "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
+        ],
+        "was_overridden": true
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating."
+    },
+    {
+      "payment_id": "pay_test1043",
+      "customer_name": "Ishita Sen",
+      "amount": 199900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 1.0,
+        "reasoning": "Since the failure was simply due to a mistyped OTP, the user can safely attempt the payment again right away by entering the correct code."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Quick update on your recent payment for \u20b91999.00",
+        "body": "Hi Ishita,\n\nWe noticed your recent netbanking payment of \u20b91999.00 didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014we are ready to retry the transaction immediately. Please keep your phone handy to enter the correct OTP when prompted.\n\nThank you for your patience!\n\nBest,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:34:49.933673",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1044",
+      "customer_name": "Ishita Sen",
+      "amount": 99900,
+      "error_reason": "insufficient_funds",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction was declined by the customer's bank due to a lack of available funds in the account.",
+        "recommended_action": "retry_later",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is caused by insufficient funds, retrying after a longer wait allows the customer time to deposit money into their account."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_later",
+        "final_action": "retry_later",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Payment update for your recent order",
+        "body": "Hi Ishita,\n\nWe noticed your recent payment of \u20b9999.00 couldn't be completed, as your bank declined the netbanking transaction due to insufficient funds.\n\nNo worries at all! We will automatically retry the transaction later, or you can update your payment method whenever you're ready.\n\nThank you,\nCustomer Support"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:35:11.237119",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-03T05:35:11.237119",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1045",
+      "customer_name": "Sneha Iyer",
+      "amount": 99900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI transaction was blocked by security systems due to suspected fraudulent activity requiring manual intervention.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 1.0,
+        "reasoning": "Transactions flagged for suspected fraud cannot be resolved through automated retries and require manual review by support staff."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1046",
+      "customer_name": "Rohan Mehta",
+      "amount": 99900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment failed because the customer entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure was simply due to a mistyped OTP, the customer can safely attempt the UPI payment again right away by entering the correct code."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment of \u20b9999.00 unsuccessful",
+        "body": "Hi Rohan,\n\nYour recent UPI payment of \u20b9999.00 didn't go through because the OTP entered was incorrect. No worries, it happens! \n\nWe are going to retry the transaction immediately, so please keep your phone handy to enter the correct OTP when prompted.\n\nThank you for your patience!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:35:31.569572",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1047",
+      "customer_name": "Divya Reddy",
+      "amount": 199900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The payment failed because a card decline occurred despite the transaction being initiated via UPI.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.95,
+        "reasoning": "Since the issuer explicitly declined the transaction, retrying the same payment method is unlikely to succeed and the user should be asked to use a different payment option."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Update your payment method for \u20b91999.00",
+        "body": "Hi Divya,\n\nWe tried to process your payment of \u20b91999.00, but it was declined by your card issuer, even though it was initiated via UPI.\n\nCould you please update your payment method or try a different one at your earliest convenience? You can complete your purchase securely here: [Payment Link].\n\nThanks for your prompt help!\n\nBest regards,\n[Your Company Name]"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:35:58.481469",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:35:58.481469",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T23:35:58.481469",
+          "outcome": "still_failed"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Customer provided a new payment method, but the payment still failed."
+    },
+    {
+      "payment_id": "pay_test1048",
+      "customer_name": "Sneha Iyer",
+      "amount": 199900,
+      "error_reason": "issuer_unavailable",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment failed because the issuing bank's payment gateway is currently experiencing downtime.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.95,
+        "reasoning": "Since the issue is a temporary bank-side outage, retrying after a couple of hours allows sufficient time for the bank's gateway to recover."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Sneha,\n\nWe noticed your recent payment of \u20b91,999.00 didn't go through because your bank's payment gateway is currently experiencing some downtime.\n\nDon't worry\u2014we\u2019ll automatically retry the payment soon once the issue is resolved on the bank's end. No further action is needed from you right now.\n\nThanks for your patience!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:36:15.211854",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T19:36:15.211854",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1049",
+      "customer_name": "Karan Malhotra",
+      "amount": 99900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking payment failed because the card used is expired.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Since the underlying card has expired, retrying the same payment method will not succeed and the user must provide a new payment instrument."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Update payment method for your recent order",
+        "body": "Hi Karan,\n\nWe tried processing your payment of \u20b9999.00, but it looks like the card on file has expired. \n\nTo complete your transaction, could you please update your payment details or use a different card? You can easily add a new payment method by visiting your account.\n\nLet us know if you need any help!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:36:25.080408",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:36:25.080408",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-03T05:36:25.080408",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-03T05:36:25.080408",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1050",
+      "customer_name": "Sneha Iyer",
+      "amount": 299900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is due to a simple user input error, the customer can easily attempt the payment again right away with the correct OTP."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment update for your recent order",
+        "body": "Hi Sneha,\n\nWe tried processing your payment of \u20b92999.00, but it didn't go through because the OTP entered was incorrect. \n\nNo worries\u2014we are automatically retrying the payment for you right now. If it still doesn't go through, you can easily complete it via your account dashboard. \n\nThanks for your patience!\n\nBest,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:36:51.865904",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:41:51.865904",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1051",
+      "customer_name": "Karan Malhotra",
+      "amount": 149900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card issuer declined the transaction for the \u20b91499.00 payment.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the card issuer explicitly declined the card, simply retrying the same payment method is unlikely to succeed without intervention."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment method for \u20b91499.00",
+        "body": "Hi Karan,\n\nWe tried to process your \u20b91499.00 payment, but it was unfortunately declined by your card issuer.\n\nTo ensure uninterrupted service, could you please update your payment method? You can easily retry the payment or add a new card through your account dashboard.\n\nLet us know if you need any help.\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:37:07.352117",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:37:07.352117",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1052",
+      "customer_name": "Arjun Kapoor",
+      "amount": 49900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction failed because the card issuer declined the payment request.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 0.9,
+        "reasoning": "Since the issuer explicitly declined the transaction, retrying the same payment method is unlikely to succeed and the customer should use an alternative payment option."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 1,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action required: Payment update needed for your recent order",
+        "body": "Hi Arjun,\n\nWe tried to process your payment of \u20b9499.00, but it was unfortunately declined by your card issuer. \n\nTo ensure your service isn't interrupted, could you please update your payment method or try a different card? You can easily complete the process here: [Payment Link].\n\nReach out if you need any help!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:37:26.775118",
+          "outcome": "customer_updated_method"
+        },
+        {
+          "attempt": 1,
+          "type": "payment_attempt_with_new_method",
+          "timestamp": "2026-09-02T17:37:26.775118",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1053",
+      "customer_name": "Arjun Kapoor",
+      "amount": 99900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The transaction was blocked due to suspected fraudulent activity requiring manual review.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 0.95,
+        "reasoning": "Fraud flags require manual review and intervention rather than automated retries."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1054",
+      "customer_name": "Rohan Mehta",
+      "amount": 149900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card transaction was flagged as suspected fraudulent activity by the payment system and requires manual review before proceeding.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 0.95,
+        "reasoning": "Since the transaction is flagged for suspected fraud and requires manual review, automated retries are inappropriate and human intervention is necessary."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1055",
+      "customer_name": "Divya Reddy",
+      "amount": 49900,
+      "error_reason": "suspected_fraud",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The transaction was blocked due to a fraud suspicion flag, requiring manual intervention before it can proceed.",
+        "recommended_action": "escalate_to_human",
+        "confidence": 0.95,
+        "reasoning": "Because the transaction is flagged for suspected fraud and requires manual review, automated retries are inappropriate and human intervention is necessary."
+      },
+      "policy_decision": {
+        "proposed_action": "escalate_to_human",
+        "final_action": "escalate_to_human",
+        "max_attempts": 1,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": null,
+      "attempts": [],
+      "final_status": "escalated",
+      "escalation_reason": "Escalated at initial diagnosis."
+    },
+    {
+      "payment_id": "pay_test1056",
+      "customer_name": "Aarav Sharma",
+      "amount": 299900,
+      "error_reason": "expired_card",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking payment failed because the underlying card used in the transaction has expired.",
+        "recommended_action": "request_new_payment_method",
+        "confidence": 1.0,
+        "reasoning": "Retrying the expired card via netbanking will continue to fail, so the customer must provide a valid payment method."
+      },
+      "policy_decision": {
+        "proposed_action": "request_new_payment_method",
+        "final_action": "request_new_payment_method",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment method for Aarav Sharma",
+        "body": "Hi Aarav,\n\nWe noticed your recent payment of \u20b92,999.00 didn't go through because the card used has expired. \n\nTo keep your service uninterrupted, please take a moment to update your payment details with a new card using the link below.\n\n[Update Payment Method]\n\nThank you for being with us!\n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T17:37:57.102097",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-02T23:37:57.102097",
+          "outcome": "no_response"
+        },
+        {
+          "attempt": 3,
+          "type": "payment_method_update_request",
+          "timestamp": "2026-09-03T05:37:57.102097",
+          "outcome": "no_response"
+        }
+      ],
+      "final_status": "escalated",
+      "escalation_reason": "Customer did not respond to 3 payment-method update request(s)."
+    },
+    {
+      "payment_id": "pay_test1057",
+      "customer_name": "Sneha Iyer",
+      "amount": 149900,
+      "error_reason": "card_declined",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The netbanking transaction failed because the card issuer declined the authorization request.",
+        "recommended_action": "retry_soon",
+        "confidence": 0.85,
+        "reasoning": "Bank-side card declines are often temporary and may succeed after a short waiting period once the issuer clears the block."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_soon",
+        "final_action": "retry_soon",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Update your payment for \u20b91499.00",
+        "body": "Hi Sneha,\n\nWe tried to process your payment of \u20b91499.00, but your card issuer declined the transaction. This sometimes happens due to temporary security blocks. \n\nNo worries\u2014we will automatically retry the payment soon, or you can update your payment details anytime to ensure uninterrupted service. \n\nIf you need any help, just reply to this email. \n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:38:11.322869",
+          "outcome": "still_failed"
+        },
+        {
+          "attempt": 2,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T19:38:11.322869",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1058",
+      "customer_name": "Aarav Sharma",
+      "amount": 299900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The UPI payment of \u20b92999.00 failed because the user entered an incorrect OTP.",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure was solely due to a mistyped OTP, the user can safely attempt the payment again right away with the correct code."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Action needed: Payment of \u20b92999.00 could not be processed",
+        "body": "Hi Aarav,\n\nWe tried to process your payment of \u20b92999.00, but it looks like the UPI transaction failed because an incorrect OTP was entered.\n\nNo worries\u2014it happens! Please click the link below to try again whenever you're ready.\n\n[Retry Payment]\n\nThanks,\nTeam"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:38:20.742822",
+          "outcome": "recovered"
+        }
+      ],
+      "final_status": "recovered",
+      "escalation_reason": null
+    },
+    {
+      "payment_id": "pay_test1059",
+      "customer_name": "Karan Malhotra",
+      "amount": 149900,
+      "error_reason": "incorrect_otp",
+      "data_source": "simulated",
+      "ai_diagnosis": {
+        "diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
+        "recommended_action": "retry_immediately",
+        "confidence": 0.95,
+        "reasoning": "Since the failure is simply due to a mistyped OTP, prompting the customer to try again immediately with the correct OTP will likely resolve the issue."
+      },
+      "policy_decision": {
+        "proposed_action": "retry_immediately",
+        "final_action": "retry_immediately",
+        "max_attempts": 3,
+        "policy_notes": [],
+        "was_overridden": false
+      },
+      "recovery_email": {
+        "subject": "Payment update needed for your recent transaction",
+        "body": "Hi Karan,\n\nWe noticed your recent payment of \u20b91,499.00 didn't go through because the OTP entered was incorrect. No worries, these things happen! \n\nWe are automatically retrying the transaction for you right now, so no further action is needed on your end. \n\nIf you have any questions, just reply to this email. \n\nBest regards,\nSupport Team"
+      },
+      "attempts": [
+        {
+          "attempt": 1,
+          "type": "payment_retry",
+          "timestamp": "2026-09-02T17:38:25.558245",
           "outcome": "recovered"
         }
       ],

@@ -1,33 +1,29 @@
 import json
 import random
 
-random.seed(42)  # fixed seed: reproducible results across runs
+random.seed(42)
 
-# GROUND TRUTH — defined independently, before looking at any agent output.
-# Represents our best-effort estimate of how likely a given (failure reason,
-# action) pair is to actually resolve a payment, in a real system. This is
-# still a simulation (we have no real gateway outcome data), but it is fixed
-# and used identically to score both the baseline and the agent, so neither
-# is favored by how the numbers were chosen.
+# GROUND TRUTH for actions that retry the SAME payment method.
 GROUND_TRUTH_SUCCESS_PROB = {
     ("insufficient_funds", "retry_later"): 0.35,
     ("insufficient_funds", "retry_soon"): 0.15,
     ("insufficient_funds", "retry_immediately"): 0.05,
-    ("insufficient_funds", "request_new_payment_method"): 0.20,
     ("card_declined", "retry_later"): 0.30,
-    ("card_declined", "request_new_payment_method"): 0.45,
-    ("expired_card", "retry_later"): 0.02,   # retrying the same expired card rarely works
-    ("expired_card", "request_new_payment_method"): 0.55,
+    ("expired_card", "retry_later"): 0.02,
     ("issuer_unavailable", "retry_soon"): 0.60,
     ("issuer_unavailable", "retry_later"): 0.50,
     ("incorrect_otp", "retry_immediately"): 0.70,
     ("incorrect_otp", "retry_later"): 0.40,
     ("payment_failed", "retry_later"): 0.40,
     ("international_transaction_not_allowed", "retry_later"): 0.02,
-    ("international_transaction_not_allowed", "request_new_payment_method"): 0.50,
-    ("suspected_fraud", "retry_later"): 0.0,  # never recoverable via retry, by design
+    ("suspected_fraud", "retry_later"): 0.0,
 }
-DEFAULT_PROB = 0.1  # fallback for any (reason, action) pair not listed above
+DEFAULT_PROB = 0.1
+
+# GROUND TRUTH for the request_new_payment_method workflow: independent of
+# retry probabilities, since it's a genuinely different action.
+GROUND_TRUTH_CUSTOMER_UPDATE_PROB = 0.45
+GROUND_TRUTH_NEW_METHOD_SUCCESS_PROB = 0.85
 
 
 def simulate_outcome(error_reason, action, max_attempts):
@@ -35,6 +31,15 @@ def simulate_outcome(error_reason, action, max_attempts):
     the payment, within max_attempts. Returns (success: bool, attempts_used: int)."""
     if action in ("escalate_to_human", "no_action"):
         return False, 0
+
+    if action == "request_new_payment_method":
+        for attempt in range(1, max_attempts + 1):
+            if random.random() < GROUND_TRUTH_CUSTOMER_UPDATE_PROB:
+                if random.random() < GROUND_TRUTH_NEW_METHOD_SUCCESS_PROB:
+                    return True, attempt
+                return False, attempt  # customer updated, but payment still failed
+        return False, max_attempts
+
     prob = GROUND_TRUTH_SUCCESS_PROB.get((error_reason, action), DEFAULT_PROB)
     for attempt in range(1, max_attempts + 1):
         if random.random() < prob:
@@ -69,14 +74,12 @@ def main():
         reason = payment["error_reason"]
         amount = payment["amount"]
 
-        # Baseline: always retry_later, always 3 attempts, no diagnosis at all.
         baseline_success, baseline_attempts = simulate_outcome(reason, "retry_later", 3)
         baseline_total_attempts += baseline_attempts
         if baseline_success:
             baseline_recovered_amount += amount
             baseline_recovered_count += 1
 
-        # Agent: whatever action + attempt cap the agent+policy actually chose.
         agent_action = result["policy_decision"]["final_action"]
         agent_max_attempts = result["policy_decision"]["max_attempts"]
         agent_success, agent_attempts = simulate_outcome(reason, agent_action, agent_max_attempts)

@@ -1,227 +1,227 @@
 [
   {
+    "payment_id": "pay_TW0ExudYOqzeL7",
+    "customer_name": "Real Test Customer 1",
+    "amount": 49900,
+    "error_reason": "international_transaction_not_allowed",
+    "ai_diagnosis": "The payment failed because the customer used an international card which is not supported by the current payment gateway.",
+    "escalation_reason": "Customer provided a new payment method, but the payment still failed.",
+    "attempts_made": 2
+  },
+  {
+    "payment_id": "pay_TW0K4mXKldNsbf",
+    "customer_name": "Real Test Customer 2",
+    "amount": 49900,
+    "error_reason": "payment_failed",
+    "ai_diagnosis": "The card payment failed due to an unspecified generic error code.",
+    "escalation_reason": "Retries exhausted (1 attempts) without recovery.",
+    "attempts_made": 1
+  },
+  {
     "payment_id": "pay_test1000",
-    "customer_name": "Divya Reddy",
-    "amount": 199900,
-    "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The netbanking transaction was flagged for suspected fraudulent activity by the system, triggering a manual review.",
-    "escalation_reason": "Escalated at initial diagnosis.",
+    "customer_name": "Karan Malhotra",
+    "amount": 99900,
+    "error_reason": "insufficient_funds",
+    "ai_diagnosis": "The UPI payment of \u20b9999.00 failed because the customer's bank account lacks sufficient funds to complete the transaction.",
+    "escalation_reason": "Overrode AI recommendation 'retry_later': attempts already exhausted (3); escalating.",
     "attempts_made": 0
   },
   {
     "payment_id": "pay_test1001",
     "customer_name": "Karan Malhotra",
-    "amount": 149900,
-    "error_reason": "insufficient_funds",
-    "ai_diagnosis": "The UPI payment failed because the customer's bank account did not have enough funds to cover the transaction.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
-    "attempts_made": 3
+    "amount": 99900,
+    "error_reason": "expired_card",
+    "ai_diagnosis": "The payment failed because the card used for the transaction has expired.",
+    "escalation_reason": "Customer provided a new payment method, but the payment still failed.",
+    "attempts_made": 4
   },
   {
-    "payment_id": "pay_test1003",
-    "customer_name": "Karan Malhotra",
-    "amount": 49900,
-    "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and requires manual intervention.",
-    "escalation_reason": "Escalated at initial diagnosis.",
-    "attempts_made": 0
+    "payment_id": "pay_test1006",
+    "customer_name": "Divya Reddy",
+    "amount": 99900,
+    "error_reason": "card_declined",
+    "ai_diagnosis": "The card issuer declined the transaction for \u20b9999.00 without a specific permanent error code.",
+    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
+    "attempts_made": 3
   },
   {
     "payment_id": "pay_test1007",
-    "customer_name": "Arjun Kapoor",
-    "amount": 149900,
-    "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The UPI payment of \u20b91499.00 was blocked and flagged for suspected fraudulent activity, requiring manual security review.",
-    "escalation_reason": "Escalated at initial diagnosis.",
-    "attempts_made": 0
-  },
-  {
-    "payment_id": "pay_test1009",
     "customer_name": "Rohan Mehta",
     "amount": 299900,
-    "error_reason": "insufficient_funds",
-    "ai_diagnosis": "The netbanking transaction was declined by the customer's issuing bank because the account lacks sufficient funds to cover the \u20b92999.00 charge.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
-    "attempts_made": 3
-  },
-  {
-    "payment_id": "pay_test1014",
-    "customer_name": "Arjun Kapoor",
-    "amount": 99900,
-    "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The netbanking transaction was flagged by security systems for suspected fraudulent activity, necessitating a manual review.",
-    "escalation_reason": "Escalated at initial diagnosis.",
-    "attempts_made": 0
-  },
-  {
-    "payment_id": "pay_test1020",
-    "customer_name": "Arjun Kapoor",
-    "amount": 99900,
-    "error_reason": "card_declined",
-    "ai_diagnosis": "The UPI payment failed because the underlying card issuer declined the transaction.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
-    "attempts_made": 3
-  },
-  {
-    "payment_id": "pay_test1021",
-    "customer_name": "Priya Nair",
-    "amount": 199900,
-    "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The transaction was flagged by security systems for suspected fraudulent activity, necessitating manual intervention.",
-    "escalation_reason": "Escalated at initial diagnosis.",
-    "attempts_made": 0
-  },
-  {
-    "payment_id": "pay_test1027",
-    "customer_name": "Rohan Mehta",
-    "amount": 99900,
-    "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The netbanking transaction was flagged by security systems for suspected fraudulent activity and requires manual intervention.",
-    "escalation_reason": "Escalated at initial diagnosis.",
-    "attempts_made": 0
-  },
-  {
-    "payment_id": "pay_test1028",
-    "customer_name": "Rohan Mehta",
-    "amount": 199900,
     "error_reason": "issuer_unavailable",
-    "ai_diagnosis": "The UPI payment failed because the issuing bank's payment gateway is temporarily down.",
+    "ai_diagnosis": "The netbanking transaction failed because the issuing bank's payment gateway is temporarily offline.",
     "escalation_reason": "Overrode AI recommendation 'retry_soon': attempts already exhausted (3); escalating.",
     "attempts_made": 0
   },
   {
-    "payment_id": "pay_test1030",
-    "customer_name": "Rohan Mehta",
-    "amount": 199900,
-    "error_reason": "card_declined",
-    "ai_diagnosis": "The card issuer rejected the transaction for the \u20b91999.00 payment.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
-    "attempts_made": 3
-  },
-  {
-    "payment_id": "pay_test1032",
-    "customer_name": "Aarav Sharma",
-    "amount": 49900,
-    "error_reason": "card_declined",
-    "ai_diagnosis": "The UPI payment attempt failed because the transaction was declined by the card issuer.",
-    "escalation_reason": "Retries exhausted (1 attempts) without recovery.",
-    "attempts_made": 1
-  },
-  {
-    "payment_id": "pay_test1034",
-    "customer_name": "Arjun Kapoor",
-    "amount": 49900,
-    "error_reason": "insufficient_funds",
-    "ai_diagnosis": "The customer's card transaction for \u20b9499.00 was declined by the issuing bank due to a lack of available funds.",
-    "escalation_reason": "Retries exhausted (1 attempts) without recovery.",
-    "attempts_made": 1
-  },
-  {
-    "payment_id": "pay_test1035",
+    "payment_id": "pay_test1009",
     "customer_name": "Sneha Iyer",
-    "amount": 149900,
+    "amount": 99900,
+    "error_reason": "suspected_fraud",
+    "ai_diagnosis": "The UPI transaction was blocked by security systems due to suspected fraudulent activity.",
+    "escalation_reason": "Escalated at initial diagnosis.",
+    "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1011",
+    "customer_name": "Aarav Sharma",
+    "amount": 99900,
+    "error_reason": "suspected_fraud",
+    "ai_diagnosis": "The netbanking transaction was flagged for suspected fraudulent activity, triggering a security hold that necessitates human intervention.",
+    "escalation_reason": "Escalated at initial diagnosis.",
+    "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1012",
+    "customer_name": "Divya Reddy",
+    "amount": 49900,
+    "error_reason": "issuer_unavailable",
+    "ai_diagnosis": "The UPI payment failed because the issuing bank's payment gateway is temporarily down.",
+    "escalation_reason": "Retries exhausted (1 attempts) without recovery.",
+    "attempts_made": 1
+  },
+  {
+    "payment_id": "pay_test1015",
+    "customer_name": "Divya Reddy",
+    "amount": 199900,
     "error_reason": "suspected_fraud",
     "ai_diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and requires manual review.",
     "escalation_reason": "Escalated at initial diagnosis.",
     "attempts_made": 0
   },
   {
-    "payment_id": "pay_test1036",
-    "customer_name": "Rohan Mehta",
-    "amount": 299900,
-    "error_reason": "card_declined",
-    "ai_diagnosis": "The netbanking transaction was declined by the card issuer, indicating a temporary or fund-related rejection by the bank.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
-    "attempts_made": 3
-  },
-  {
-    "payment_id": "pay_test1039",
-    "customer_name": "Divya Reddy",
-    "amount": 99900,
-    "error_reason": "card_declined",
-    "ai_diagnosis": "The netbanking transaction failed because the card issuer declined the payment authorization.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
-    "attempts_made": 3
-  },
-  {
-    "payment_id": "pay_test1041",
-    "customer_name": "Rohan Mehta",
+    "payment_id": "pay_test1016",
+    "customer_name": "Ishita Sen",
     "amount": 49900,
     "error_reason": "expired_card",
-    "ai_diagnosis": "The payment failed because the underlying card has expired, despite the method being initiated as UPI.",
-    "escalation_reason": "Retries exhausted (1 attempts) without recovery.",
+    "ai_diagnosis": "The payment failed because the card used for the transaction has expired, despite the method being listed as UPI.",
+    "escalation_reason": "Customer did not respond to 1 payment-method update request(s).",
     "attempts_made": 1
   },
   {
-    "payment_id": "pay_test1042",
-    "customer_name": "Rohan Mehta",
-    "amount": 99900,
+    "payment_id": "pay_test1020",
+    "customer_name": "Karan Malhotra",
+    "amount": 299900,
+    "error_reason": "suspected_fraud",
+    "ai_diagnosis": "The netbanking transaction was flagged by security systems for suspected fraudulent activity, triggering a manual review.",
+    "escalation_reason": "Escalated at initial diagnosis.",
+    "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1028",
+    "customer_name": "Priya Nair",
+    "amount": 199900,
+    "error_reason": "suspected_fraud",
+    "ai_diagnosis": "The transaction was flagged by security systems for suspected fraudulent activity and requires manual review.",
+    "escalation_reason": "Escalated at initial diagnosis.",
+    "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1032",
+    "customer_name": "Arjun Kapoor",
+    "amount": 49900,
+    "error_reason": "expired_card",
+    "ai_diagnosis": "The payment failed because the card has expired, despite the payment method being listed as UPI.",
+    "escalation_reason": "Customer did not respond to 1 payment-method update request(s).",
+    "attempts_made": 1
+  },
+  {
+    "payment_id": "pay_test1035",
+    "customer_name": "Aarav Sharma",
+    "amount": 49900,
     "error_reason": "incorrect_otp",
-    "ai_diagnosis": "The card payment of \u20b9999.00 failed because the user entered an incorrect One-Time Password (OTP).",
+    "ai_diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
     "escalation_reason": "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating.",
     "attempts_made": 0
   },
   {
-    "payment_id": "pay_test1044",
+    "payment_id": "pay_test1036",
+    "customer_name": "Priya Nair",
+    "amount": 49900,
+    "error_reason": "card_declined",
+    "ai_diagnosis": "A UPI payment failed because the underlying card issuer declined the transaction.",
+    "escalation_reason": "Customer did not respond to 1 payment-method update request(s).",
+    "attempts_made": 1
+  },
+  {
+    "payment_id": "pay_test1039",
     "customer_name": "Rohan Mehta",
     "amount": 299900,
-    "error_reason": "insufficient_funds",
-    "ai_diagnosis": "The netbanking transaction failed because the customer's bank account lacks sufficient funds to cover the \u20b92999.00 charge.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
-    "attempts_made": 3
+    "error_reason": "suspected_fraud",
+    "ai_diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and blocked pending manual review.",
+    "escalation_reason": "Escalated at initial diagnosis.",
+    "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1041",
+    "customer_name": "Arjun Kapoor",
+    "amount": 49900,
+    "error_reason": "suspected_fraud",
+    "ai_diagnosis": "The netbanking transaction was flagged for potential fraud and placed on hold for manual security review.",
+    "escalation_reason": "Escalated at initial diagnosis.",
+    "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1042",
+    "customer_name": "Sneha Iyer",
+    "amount": 49900,
+    "error_reason": "incorrect_otp",
+    "ai_diagnosis": "The card payment failed because the customer entered an incorrect One-Time Password (OTP).",
+    "escalation_reason": "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating.",
+    "attempts_made": 0
   },
   {
     "payment_id": "pay_test1045",
-    "customer_name": "Arjun Kapoor",
-    "amount": 149900,
+    "customer_name": "Sneha Iyer",
+    "amount": 99900,
     "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The UPI transaction was blocked by the gateway due to flagged suspected fraudulent activity requiring manual intervention.",
+    "ai_diagnosis": "The UPI transaction was blocked by security systems due to suspected fraudulent activity requiring manual intervention.",
     "escalation_reason": "Escalated at initial diagnosis.",
     "attempts_made": 0
   },
   {
     "payment_id": "pay_test1047",
-    "customer_name": "Karan Malhotra",
+    "customer_name": "Divya Reddy",
     "amount": 199900,
     "error_reason": "card_declined",
-    "ai_diagnosis": "The netbanking transaction was declined by the card issuer, indicating a bank-side rejection.",
-    "escalation_reason": "Retries exhausted (3 attempts) without recovery.",
+    "ai_diagnosis": "The payment failed because a card decline occurred despite the transaction being initiated via UPI.",
+    "escalation_reason": "Customer provided a new payment method, but the payment still failed.",
     "attempts_made": 3
   },
   {
-    "payment_id": "pay_test1048",
-    "customer_name": "Rohan Mehta",
-    "amount": 49900,
-    "error_reason": "insufficient_funds",
-    "ai_diagnosis": "The UPI payment of \u20b9499.00 failed because the issuing bank declined the transaction due to a lack of available funds in the customer's account.",
-    "escalation_reason": "Retries exhausted (1 attempts) without recovery.",
-    "attempts_made": 1
-  },
-  {
-    "payment_id": "pay_test1049",
+    "payment_id": "pay_test1053",
     "customer_name": "Arjun Kapoor",
-    "amount": 49900,
-    "error_reason": "incorrect_otp",
-    "ai_diagnosis": "The netbanking transaction failed because the user entered an incorrect One-Time Password (OTP).",
-    "escalation_reason": "Overrode AI recommendation 'retry_immediately': attempts already exhausted (3); escalating.",
-    "attempts_made": 0
-  },
-  {
-    "payment_id": "pay_test1050",
-    "customer_name": "Karan Malhotra",
-    "amount": 199900,
+    "amount": 99900,
     "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The UPI transaction was flagged by security systems for suspected fraudulent activity and requires manual intervention.",
+    "ai_diagnosis": "The transaction was blocked due to suspected fraudulent activity requiring manual review.",
     "escalation_reason": "Escalated at initial diagnosis.",
     "attempts_made": 0
   },
   {
     "payment_id": "pay_test1054",
-    "customer_name": "Divya Reddy",
+    "customer_name": "Rohan Mehta",
     "amount": 149900,
     "error_reason": "suspected_fraud",
-    "ai_diagnosis": "The card transaction was flagged as suspected fraudulent activity and requires manual review.",
+    "ai_diagnosis": "The card transaction was flagged as suspected fraudulent activity by the payment system and requires manual review before proceeding.",
     "escalation_reason": "Escalated at initial diagnosis.",
     "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1055",
+    "customer_name": "Divya Reddy",
+    "amount": 49900,
+    "error_reason": "suspected_fraud",
+    "ai_diagnosis": "The transaction was blocked due to a fraud suspicion flag, requiring manual intervention before it can proceed.",
+    "escalation_reason": "Escalated at initial diagnosis.",
+    "attempts_made": 0
+  },
+  {
+    "payment_id": "pay_test1056",
+    "customer_name": "Aarav Sharma",
+    "amount": 299900,
+    "error_reason": "expired_card",
+    "ai_diagnosis": "The netbanking payment failed because the underlying card used in the transaction has expired.",
+    "escalation_reason": "Customer did not respond to 3 payment-method update request(s).",
+    "attempts_made": 3
   }
 ]

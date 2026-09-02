@@ -102,22 +102,25 @@ for reproducibility.
 
 | | Recovered | Amount recovered | Retry attempts used |
 |---|---|---|---|
-| Baseline (naive retry) | 34/62 | ₹52,466 | 130 |
-| Agent (AI + policy) | 40/62 | ₹65,960 | 74 |
-| **Difference** | **+6** | **+₹13,494 (+25.7%)** | **-56 (-43.1%)** |
+| Baseline (naive retry) | 34/62 | ₹52,466 | 144 |
+| Agent (AI + policy) | 36/62 | ₹55,964 | 76 |
+| **Difference** | **+2** | **+₹3,498 (+6.7%)** | **-68 (-47.2%)** |
 
 The agent recovered more payments and more total revenue than the naive
-baseline, while using under half the retry attempts — reflecting that it
-correctly avoids wasting retries on cases where retrying the same method
-won't help (e.g. an expired card), and reserves attempts for cases where
-retrying is actually likely to succeed.
+baseline, while using less than half the retry attempts. Notably,
+`request_new_payment_method` is modeled as its own distinct workflow in both
+the pipeline and this evaluation — asking a customer to update their payment
+method is not the same action as retrying the failed one, so it isn't scored
+as if it were. This makes the comparison more conservative (and more honest)
+than treating every non-escalated action as a generic retry.
 
 **Honest caveat:** this is a single simulated batch scored against a
 ground-truth model we defined ourselves, not observed real-world outcomes.
-An earlier, smaller batch (27 payments) showed a noisier, less favorable
-result on the ₹-recovered metric specifically — the attempt-efficiency gain
-was consistent across both batch sizes, since it follows directly from the
-policy design rather than from chance.
+The size of the ₹-recovered lift has varied across batch runs (from roughly
++7% to +26% depending on the specific random batch), while the
+attempt-efficiency gain has been consistently large across runs — it follows
+directly from the policy design (cost-aware caps, avoiding pointless retries
+on non-retryable failures) rather than from chance.
 
 ## Architecture
 
@@ -137,9 +140,12 @@ always logs proposed vs. final action and why
 │
 ▼
 execute_recovery(): runs the approved action
-retry actions: staggered, realistically-spaced attempts
-escalate_to_human: stops immediately, logs reason
-no_action: stops immediately
+- retry actions (same method): staggered, realistically-spaced attempts
+- request_new_payment_method: a DISTINCT workflow — requests the 
+  customer update their method, and only attempts payment again if
+  they do. Not treated as a retry of the failed method.
+- escalate_to_human: stops immediately, logs reason
+- no_action: stops immediately
 │
 ▼
 outcome: recovered / escalated / no_action
