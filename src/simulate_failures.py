@@ -77,7 +77,7 @@ def generate_failed_payment(index):
 
 
 def main():
-    batch_size = 25
+    batch_size = 60
     failed_payments = [generate_failed_payment(i) for i in range(batch_size)]
 
     with open("../data/failed_payments.json", "w") as f:
