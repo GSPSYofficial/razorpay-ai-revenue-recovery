@@ -46,7 +46,6 @@ Payment context:
 - Payment method: {payment.get('method', 'unknown')}
 - Failure reason code: {payment['error_reason']}
 - Failure description: {payment['error_description']}
-- Previous recovery attempts on this payment: {payment.get('prior_attempts', 0)}
 
 Allowed actions (choose exactly one):
 - retry_immediately: safe to retry within minutes (e.g. transient auth issues)

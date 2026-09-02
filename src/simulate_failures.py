@@ -58,6 +58,10 @@ CUSTOMER_NAMES = ["Aarav Sharma", "Priya Nair", "Rohan Mehta", "Sneha Iyer",
 def generate_failed_payment(index):
     failure = random.choice(FAILURE_TYPES)
     created_at = datetime.now() - timedelta(hours=random.randint(1, 72))
+    # Most payments are fresh (0 prior attempts). A small number simulate recovery attempts.
+    # payments that have already exhausted retries elsewhere, so the
+    # policy layer's attempt-cap enforcement is demonstrably exercised.
+    prior_attempts = 3 if index % 7 == 0 else 0
     return {
         "id": f"pay_test{1000 + index}",
         "amount": random.choice([49900, 99900, 149900, 199900, 299900]),  # in paise
@@ -67,6 +71,7 @@ def generate_failed_payment(index):
         "customer_name": random.choice(CUSTOMER_NAMES),
         "customer_email": f"customer{index}@example.com",
         "created_at": created_at.isoformat(),
+        "prior_attempts": prior_attempts,
         **failure,
     }
 

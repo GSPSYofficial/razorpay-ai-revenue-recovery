@@ -1,76 +1,41 @@
 import json
 import os
 import random
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from dotenv import load_dotenv
-import google.generativeai as genai
 
-load_dotenv()  # loads GEMINI_API_KEY from the .env file at project root
+from agent import diagnose_and_recommend, call_gemini_with_retry
+from policy import evaluate, RETRY_SPACING
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-3.5-flash-lite")
+load_dotenv()
 
-MAX_ATTEMPTS = 3  # stopping rule: stop retrying after this many tries
-
-# Maps each failure reason to the right recovery action and a rough
-# probability of success per attempt (used only for our simulation —
-# in a real system this would come from actual retry outcomes).
-ACTION_MAP = {
-    "insufficient_funds": {"action": "retry_later", "success_prob": 0.35},
-    "card_declined": {"action": "retry_later", "success_prob": 0.30},
-    "expired_card": {"action": "request_new_payment_method", "success_prob": 0.55},
-    "issuer_unavailable": {"action": "retry_soon", "success_prob": 0.60},
-    "incorrect_otp": {"action": "retry_immediately", "success_prob": 0.70},
-    "payment_failed": {"action": "retry_later", "success_prob": 0.40},
-    "international_transaction_not_allowed": {"action": "request_new_payment_method", "success_prob": 0.50},
-}
-
-LOW_VALUE_THRESHOLD = 99900  # ₹999.00, in paise
-
-def get_max_attempts(amount):
-    """Cost-aware retry cap: low-value payments get fewer retries, since the
-    cost of repeated attempts (customer friction, gateway overhead) may
-    outweigh the amount recovered."""
-    if amount < LOW_VALUE_THRESHOLD:
-        return 1
-    return MAX_ATTEMPTS
-
-# How far apart retries happen, depending on the action type.
-# This reflects real dunning/retry practice — immediate issues (like OTP)
-# get retried within minutes, while bank/fund issues need more time to resolve.
-RETRY_SPACING = {
-    "retry_immediately": timedelta(minutes=5),
-    "retry_soon": timedelta(hours=2),
-    "retry_later": timedelta(hours=12),
-    "request_new_payment_method": timedelta(hours=6),
+# Simulation-only: how likely a given failure reason is to resolve if the
+# execution layer's chosen action is carried out. This is NOT used by the
+# AI or the policy layer to make decisions — it only drives what happens
+# in our simulated outcome, since we don't have real gateway responses.
+SIMULATED_SUCCESS_PROB = {
+    "insufficient_funds": 0.35,
+    "card_declined": 0.30,
+    "expired_card": 0.55,
+    "issuer_unavailable": 0.60,
+    "incorrect_otp": 0.70,
+    "payment_failed": 0.40,
+    "international_transaction_not_allowed": 0.50,
+    "suspected_fraud": 0.0,  # never auto-retried; see policy.py
 }
 
 
-def call_gemini_with_retry(prompt, max_retries=5):
-    """Calls Gemini, automatically waiting and retrying if we hit a rate limit."""
-    for attempt in range(max_retries):
-        try:
-            return model.generate_content(prompt)
-        except Exception as e:
-            if "429" in str(e) or "ResourceExhausted" in str(e):
-                wait_time = 20  # seconds — safely above the per-minute reset window
-                print(f"  Rate limited, waiting {wait_time}s before retry...")
-                time.sleep(wait_time)
-            else:
-                raise
-    raise RuntimeError("Failed after max retries due to rate limiting.")
-
-
-def generate_recovery_email(payment):
-    """Ask Gemini to draft a short recovery email for this failed payment."""
+def generate_recovery_email(payment, ai_diagnosis, final_action):
+    """Ask Gemini to draft a short recovery email, informed by the AI's
+    own diagnosis/reasoning so the message reflects the actual decision made."""
     prompt = f"""Write a short, polite payment recovery email for a customer whose payment failed.
 
 Customer name: {payment['customer_name']}
 Amount: ₹{payment['amount'] / 100:.2f}
 Failure reason: {payment['error_description']}
-Recommended action: {ACTION_MAP[payment['error_reason']]['action']}
+Diagnosis: {ai_diagnosis['diagnosis']}
+Action being taken: {final_action}
 
 Return ONLY valid JSON in this exact format, nothing else:
 {{"subject": "...", "body": "..."}}
@@ -78,15 +43,11 @@ Return ONLY valid JSON in this exact format, nothing else:
 Keep the body under 80 words. Be warm but concise. Don't be pushy."""
 
     response = call_gemini_with_retry(prompt)
-    text = response.text.strip()
-
-    # Gemini sometimes wraps JSON in markdown code fences — strip those if present
-    text = text.replace("```json", "").replace("```", "").strip()
+    text = response.text.strip().replace("```json", "").replace("```", "").strip()
 
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # Fallback if the model doesn't return clean JSON
         return {
             "subject": "We couldn't process your payment",
             "body": f"Hi {payment['customer_name']}, your recent payment of "
@@ -94,36 +55,78 @@ Keep the body under 80 words. Be warm but concise. Don't be pushy."""
         }
 
 
-def simulate_recovery_attempts(payment):
-    """Simulate retry attempts up to a cost-aware cap, spaced realistically, stopping on success."""
-    config = ACTION_MAP[payment["error_reason"]]
-    spacing = RETRY_SPACING[config["action"]]
-    max_attempts = get_max_attempts(payment["amount"])
-    attempts_log = []
-    recovered = False
+def execute_recovery(payment, policy_decision):
+    """
+    Deterministically executes the strategy the policy layer approved.
+    Returns (final_status, attempts_log, escalation_reason_or_None).
+    This is where 'observe result, decide recovered/retry/escalate/stop'
+    actually happens — no further AI calls here, by design.
+    """
+    final_action = policy_decision["final_action"]
+    max_attempts = policy_decision["max_attempts"]
 
+    if final_action == "escalate_to_human":
+        reason = "; ".join(policy_decision["policy_notes"]) or "Escalated at initial diagnosis."
+        return "escalated", [], reason
+
+    if final_action == "no_action":
+        return "no_action", [], None
+
+    # Remaining actions (retry_immediately, retry_soon, retry_later,
+    # request_new_payment_method) all execute as a bounded retry loop.
+    spacing = RETRY_SPACING[final_action]
+    success_prob = SIMULATED_SUCCESS_PROB.get(payment["error_reason"], 0.3)
+    attempts_log = []
     attempt_time = datetime.now()
 
     for attempt_num in range(1, max_attempts + 1):
-        success = random.random() < config["success_prob"]
+        success = random.random() < success_prob
         attempts_log.append({
             "attempt": attempt_num,
             "timestamp": attempt_time.isoformat(),
             "outcome": "recovered" if success else "still_failed",
         })
         if success:
-            recovered = True
-            break
+            return "recovered", attempts_log, None
         attempt_time += spacing
 
-    return recovered, attempts_log, max_attempts
+    # Attempts exhausted without success — stop automated recovery, escalate.
+    return "escalated", attempts_log, f"Retries exhausted ({max_attempts} attempts) without recovery."
+
+
+def process_payment(payment):
+    """Runs one payment through the full agent → policy → execution pipeline."""
+    ai_diagnosis = diagnose_and_recommend(payment)
+    policy_decision = evaluate(payment, ai_diagnosis)
+
+    final_status, attempts_log, escalation_reason = execute_recovery(payment, policy_decision)
+
+    # Skip customer email for escalation cases with no attempts (e.g. fraud) —
+    # sending a "please retry" email during a fraud review would be wrong.
+    email = None
+    if policy_decision["final_action"] not in ("escalate_to_human", "no_action"):
+        email = generate_recovery_email(payment, ai_diagnosis, policy_decision["final_action"])
+
+    return {
+        "payment_id": payment["id"],
+        "customer_name": payment["customer_name"],
+        "amount": payment["amount"],
+        "error_reason": payment["error_reason"],
+        "data_source": payment.get("data_source", "simulated"),
+        "ai_diagnosis": ai_diagnosis,
+        "policy_decision": policy_decision,
+        "recovery_email": email,
+        "attempts": attempts_log,
+        "final_status": final_status,
+        "escalation_reason": escalation_reason,
+    }
 
 
 def main():
     with open("../data/failed_payments.json", "r") as f:
         simulated_payments = json.load(f)
-    for p in simulated_payments:
-        p["data_source"] = "simulated"
+        for p in simulated_payments:
+            p["data_source"] = "simulated"
 
     try:
         with open("../data/real_failed_payments.json", "r") as f:
@@ -135,41 +138,51 @@ def main():
 
     results = []
     recovered_count = 0
+    escalated_count = 0
+    no_action_count = 0
     total_amount_recovered = 0
 
     for payment in failed_payments:
         print(f"Processing {payment['id']} ({payment['error_reason']})...")
+        result = process_payment(payment)
+        results.append(result)
 
-        action = ACTION_MAP[payment["error_reason"]]["action"]
-        email = generate_recovery_email(payment)
-        recovered, attempts_log, max_attempts_used = simulate_recovery_attempts(payment)
-
-        if recovered:
+        if result["final_status"] == "recovered":
             recovered_count += 1
             total_amount_recovered += payment["amount"]
-
-        results.append({
-            "payment_id": payment["id"],
-            "customer_name": payment["customer_name"],
-            "amount": payment["amount"],
-            "error_reason": payment["error_reason"],
-            "action_taken": action,
-            "retry_cap_applied": max_attempts_used,
-            "recovery_email": email,
-            "attempts": attempts_log,
-            "final_status": "recovered" if recovered else "unrecovered",
-            "data_source": payment.get("data_source", "simulated"),
-        })
-
-        time.sleep(4)  # small delay to stay well within free-tier rate limits
+        elif result["final_status"] == "escalated":
+            escalated_count += 1
+        elif result["final_status"] == "no_action":
+            no_action_count += 1
 
     summary = {
         "total_processed": len(failed_payments),
         "recovered_count": recovered_count,
+        "escalated_count": escalated_count,
+        "no_action_count": no_action_count,
+        "unrecovered_other_count": len(failed_payments) - recovered_count - escalated_count - no_action_count,
         "recovery_rate_pct": round(recovered_count / len(failed_payments) * 100, 1),
         "total_amount_recovered_rupees": total_amount_recovered / 100,
         "generated_at": datetime.now().isoformat(),
+        "note": "Recovery outcomes are simulated (SIMULATED_SUCCESS_PROB), "
+                "not observed from real gateway responses.",
     }
+
+    escalation_queue = [
+        {
+            "payment_id": r["payment_id"],
+            "customer_name": r["customer_name"],
+            "amount": r["amount"],
+            "error_reason": r["error_reason"],
+            "ai_diagnosis": r["ai_diagnosis"]["diagnosis"],
+            "escalation_reason": r["escalation_reason"],
+            "attempts_made": len(r["attempts"]),
+        }
+        for r in results if r["final_status"] == "escalated"
+    ]
+
+    with open("../output/escalation_queue.json", "w") as f:
+        json.dump(escalation_queue, f, indent=2)
 
     output = {"summary": summary, "results": results}
 
@@ -179,6 +192,8 @@ def main():
     print("\n--- Summary ---")
     print(f"Processed: {summary['total_processed']}")
     print(f"Recovered: {summary['recovered_count']} ({summary['recovery_rate_pct']}%)")
+    print(f"Escalated: {summary['escalated_count']}")
+    print(f"No action: {summary['no_action_count']}")
     print(f"Amount recovered: ₹{summary['total_amount_recovered_rupees']:.2f}")
     print("Full audit trail -> output/recovery_log.json")
 
