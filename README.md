@@ -184,16 +184,20 @@ guess.
 
 ## How to run
 
+Requires Python 3.10+
+
 ```bash
 python -m venv venv
-source venv/bin/activate      # Windows: .\venv\Scripts\Activate
+source venv/bin/activate      # For Windows: .\venv\Scripts\Activate
 pip install -r requirements.txt
 ```
 
 Create a `.env` file in the project root:
 
 RAZORPAY_KEY_ID=your_key_id
+
 RAZORPAY_KEY_SECRET=your_key_secret
+
 GEMINI_API_KEY=your_gemini_key
 
 
@@ -204,6 +208,21 @@ python simulate_failures.py       # generates a fresh simulated batch
 python diagnose_and_recover.py    # runs the full agent -> policy -> execution loop
 python verify_log.py              # sanity-checks the output (recommended after every run)
 python evaluate.py                # scores agent vs. baseline against ground truth
+
+Known issue: The model name in agent.py (line 9) may occasionally return a
+503 "high demand" error, as Google's Gemini API frequently rotates model
+availability. If this happens, open src/agent.py, find line 9:
+
+    model = genai.GenerativeModel("gemini-3.5-flash-lite")
+
+and replace "gemini-3.5-flash-lite" with any of these current alternatives:
+
+- gemini-3.6-flash       (current default, higher quality)
+- gemini-3.7-flash       (newer, stronger at agentic/reasoning tasks)
+- gemini-3.1-flash-lite  (lighter, higher free-tier rate limits)
+
+Save the file and re-run. No other code changes are needed — only this
+one line.
 ```
 
 To verify the policy override mechanism directly, in isolation:
@@ -218,11 +237,12 @@ python find_payment.py <payment_id>
 
 To capture a fresh real failure via Razorpay's actual checkout flow:
 ```bash
-python create_test_order.py        # creates a real test-mode order
-cd ..
-python -m http.server 8000
-# open http://localhost:8000/src/checkout_test.html in a browser,
-# use a Razorpay test card, and click "Failure" on the mock bank page
+1. Open src/checkout_test.html and replace "YOUR_RAZORPAY_KEY_ID" with your own Razorpay test Key ID
+2. python create_test_order.py     # creates a real test-mode order, prints an order_id
+3. Update the order_id in checkout_test.html with the one just printed
+4. cd ..
+5. python -m http.server 8000
+6. Open http://localhost:8000/src/checkout_test.html in a browser, use a Razorpay test card, and click "Failure" on the mock bank page
 ```
 
 Output: `data/failed_payments.json` (simulated batch), `output/recovery_log.json`
